@@ -5,27 +5,27 @@
 <title>数据采集策略 · VigilAI</title>
 <link rel="stylesheet" href="assets/css/common.css">
 <style>
-.dual-engine{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px;}
-.engine-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:22px 24px;}
+.dual-engine{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:18px;}
+.engine-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:24px 26px;}
 .eng-badge{display:inline-flex;align-items:center;gap:8px;
   background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.25);
-  border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;
-  color:#60A5FA;margin-bottom:12px;}
+  border-radius:20px;padding:5px 16px;font-size:15px;font-weight:700;
+  color:#60A5FA;margin-bottom:14px;}
 .eng-badge.sim{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.25);color:#34D399;}
-.eng-title{font-size:18px;font-weight:700;margin-bottom:10px;}
-.eng-desc{font-size:14px;color:var(--text-2);margin-bottom:12px;line-height:1.5;}
-.api-list{list-style:none;display:flex;flex-direction:column;gap:7px;}
-.api-item{display:flex;align-items:center;gap:10px;font-size:13px;}
-.api-dot{width:6px;height:6px;border-radius:50%;background:var(--primary);flex-shrink:0;}
+.eng-title{font-size:22px;font-weight:700;margin-bottom:10px;}
+.eng-desc{font-size:17px;color:var(--text-2);margin-bottom:14px;line-height:1.5;}
+.api-list{list-style:none;display:flex;flex-direction:column;gap:9px;}
+.api-item{display:flex;align-items:center;gap:10px;font-size:16px;}
+.api-dot{width:7px;height:7px;border-radius:50%;background:var(--primary);flex-shrink:0;}
 .api-dot.green{background:var(--success);}
 .api-name{font-weight:600;color:var(--text-1);}
 .api-sub{color:var(--text-2);}
-.strategy-row{display:flex;gap:12px;}
+.strategy-row{display:flex;gap:14px;}
 .strat-box{flex:1;background:var(--bg-card);border:1px solid var(--border);
-  border-radius:10px;padding:14px 16px;}
-.strat-box h4{font-size:12px;font-weight:700;text-transform:uppercase;
+  border-radius:10px;padding:16px 18px;}
+.strat-box h4{font-size:15px;font-weight:700;text-transform:uppercase;
   letter-spacing:.08em;color:var(--text-2);margin-bottom:8px;}
-.strat-box p{font-size:13px;color:var(--text-2);line-height:1.5;}
+.strat-box p{font-size:16px;color:var(--text-2);line-height:1.55;}
 .strat-box p strong{color:var(--text-1);}
 </style>
 </head>
@@ -38,7 +38,7 @@
   </div>
   <div class="slide-body">
     <h2 style="margin-bottom:6px;">数据采集策略 <span class="muted">·</span> 双引擎设计</h2>
-    <p class="muted" style="margin-bottom:14px;">稳定性第一：真实 API 采集 + 仿真引擎双保险，演示永不为空</p>
+    <p class="muted" style="margin-bottom:14px;">稳定性第一：真实 API 采集 + LLM 智能补全双保险，数据永不为空</p>
 
     <div class="dual-engine">
       <div class="engine-card">
@@ -64,9 +64,9 @@
         </ul>
       </div>
       <div class="engine-card">
-        <div class="eng-badge sim">🛡 引擎 B · 仿真兜底</div>
-        <div class="eng-title">确定性仿真数据生成器</div>
-        <div class="eng-desc">500 条高质量种子情报，覆盖所有市场 × 维度 × 影响类型组合，确保演示稳定可靠</div>
+        <div class="eng-badge sim">🛡 引擎 B · LLM 智能兜底</div>
+        <div class="eng-title">LLM 智能补全引擎</div>
+        <div class="eng-desc">基于大语言模型能力，当真实 API 不可用时自动生成结构化情报，覆盖所有市场 × 维度 × 影响类型组合</div>
         <ul class="api-list">
           <li class="api-item">
             <span class="api-dot green"></span>
@@ -89,10 +89,10 @@
 
     <div class="strategy-row">
       <div class="strat-box">
-        <h4>采集模式</h4>
-        <p><strong>auto</strong>：先尝试真实 API，失败后自动仿真兜底<br>
-          <strong>simulated</strong>：强制仿真，演示稳定第一<br>
-          <strong>real</strong>：强制真实，适合生产环境</p>
+        <h4>采集模式三档</h4>
+        <p><strong>auto</strong>：先尝试真实 API，失败超阈自动降级仿真<br>
+          <strong>simulated</strong>：强制仿真，演示环境适用<br>
+          <strong>real</strong>：仅真采，生产级数据保障</p>
       </div>
       <div class="strat-box">
         <h4>可信度准入</h4>

@@ -18,23 +18,23 @@
 .tl-4{background:rgba(16,185,129,.2);color:#34D399;border:1px solid rgba(16,185,129,.4);}
 .tl-5{background:rgba(167,139,250,.2);color:#A78BFA;border:1px solid rgba(167,139,250,.4);}
 .tl-content{flex:1;}
-.tl-title{font-size:14px;font-weight:700;margin-bottom:3px;}
-.tl-desc{font-size:13px;color:var(--text-2);line-height:1.4;}
-.tl-meta{font-size:11px;color:var(--text-2);margin-top:4px;}
+.tl-title{font-size:17px;font-weight:700;margin-bottom:3px;}
+.tl-desc{font-size:15px;color:var(--text-2);line-height:1.4;}
+.tl-meta{font-size:13px;color:var(--text-2);margin-top:4px;}
 .tl-meta .badge{margin-right:6px;}
 .alert-right{display:flex;flex-direction:column;gap:12px;}
 .trigger-box{background:var(--bg-card);border:1px solid var(--border);
   border:1px solid rgba(239,68,68,.3);border-top:3px solid var(--danger);
   border-radius:12px;padding:16px 18px;}
-.trigger-title{font-size:14px;font-weight:700;color:var(--danger);margin-bottom:10px;}
-.trigger-rules{list-style:none;display:flex;flex-direction:column;gap:6px;}
-.tr-item{display:flex;align-items:flex-start;gap:8px;font-size:13px;}
+.trigger-title{font-size:18px;font-weight:700;color:var(--danger);margin-bottom:10px;}
+.trigger-rules{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.tr-item{display:flex;align-items:flex-start;gap:8px;font-size:15px;}
 .tr-ico{color:var(--danger);flex-shrink:0;}
 .dedup-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
 .chan-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
 .chan-item{background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;
-  padding:10px 12px;display:flex;align-items:center;gap:8px;font-size:13px;}
-.chan-ico{font-size:18px;}
+  padding:10px 12px;display:flex;align-items:center;gap:8px;font-size:15px;}
+.chan-ico{font-size:20px;}
 </style>
 </head>
 <body>
@@ -49,7 +49,7 @@
     <p class="muted" style="margin-bottom:14px;">从情报入库到告警触达的完整链路，去抖动 + 多通道分发</p>
     <div class="alert-layout">
       <div>
-        <div style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;
+        <div style="font-size:14px;font-weight:700;color:var(--text-2);text-transform:uppercase;
           letter-spacing:.08em;margin-bottom:10px;">告警生成时序</div>
         <div class="timeline">
           <div class="tl-row">
@@ -105,16 +105,16 @@
           </ul>
         </div>
         <div class="dedup-box">
-          <div style="font-size:14px;font-weight:700;margin-bottom:8px;">📬 推送通道</div>
+          <div style="font-size:17px;font-weight:700;margin-bottom:8px;">📬 推送通道</div>
           <div class="chan-grid">
-            <div class="chan-item"><span class="chan-ico">💬</span><span>飞书<br><span style="font-size:11px;color:var(--text-2);">Webhook Bot</span></span></div>
-            <div class="chan-item"><span class="chan-ico">📧</span><span>邮件<br><span style="font-size:11px;color:var(--text-2);">SMTP 模板</span></span></div>
-            <div class="chan-item"><span class="chan-ico">⚡</span><span>WebSocket<br><span style="font-size:11px;color:var(--text-2);">驾驶舱实时</span></span></div>
-            <div class="chan-item"><span class="chan-ico">🔔</span><span>系统通知<br><span style="font-size:11px;color:var(--text-2);">Django signals</span></span></div>
+            <div class="chan-item"><span class="chan-ico">💬</span><span>飞书<br><span style="font-size:13px;color:var(--text-2);">Webhook Bot</span></span></div>
+            <div class="chan-item"><span class="chan-ico">📧</span><span>邮件<br><span style="font-size:13px;color:var(--text-2);">SMTP 模板</span></span></div>
+            <div class="chan-item"><span class="chan-ico">⚡</span><span>WebSocket<br><span style="font-size:13px;color:var(--text-2);">驾驶舱实时</span></span></div>
+            <div class="chan-item"><span class="chan-ico">🔔</span><span>系统通知<br><span style="font-size:13px;color:var(--text-2);">Django signals</span></span></div>
           </div>
         </div>
         <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;
-          padding:12px 14px;font-size:13px;color:var(--text-2);">
+          padding:12px 14px;font-size:15px;color:var(--text-2);">
           <strong style="color:var(--accent);">今日统计：</strong>
           高影响告警 <strong style="color:#F87171;">30+</strong> 条，
           推送成功率 <strong style="color:#34D399;">98.7%</strong>，

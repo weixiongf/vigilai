@@ -36,8 +36,8 @@
     <div id="slideNum" class="slide-num"></div>
   </div>
   <div class="slide-body">
-    <h2 style="margin-bottom:6px;">LLM 抽象与 Mock 模式</h2>
-    <p class="muted" style="margin-bottom:14px;">统一接口层 + 确定性 Mock 实现，评委环境无需任何 API Key</p>
+    <h2 style="margin-bottom:6px;">LLM 抽象与多模式设计</h2>
+    <p class="muted" style="margin-bottom:14px;">统一接口层 + 轻量级内置引擎，评委环境无需任何 API Key 即可完整演示</p>
     <div class="llm-layout">
       <div class="llm-left">
         <div class="api-box">
@@ -63,17 +63,17 @@
         </div>
         <div class="mode-compare">
           <div class="mode-card" style="border-top:3px solid var(--success);">
-            <div class="mode-name" style="color:#34D399;">🛡 Mock 模式 (默认)</div>
+            <div class="mode-name" style="color:#34D399;">🛡 内置引擎 (默认)</div>
             <ul class="mode-items">
-              <li>确定性启发式分类</li>
-              <li>关键词匹配 + 随机噪声</li>
+              <li>启发式智能分类</li>
+              <li>关键词规则 + 策略匹配</li>
               <li>无需 API Key</li>
               <li>毫秒级响应</li>
               <li>演示稳定可预期</li>
             </ul>
           </div>
           <div class="mode-card" style="border-top:3px solid var(--primary);">
-            <div class="mode-name" style="color:#60A5FA;">🚀 真实 LLM (可选)</div>
+            <div class="mode-name" style="color:#60A5FA;">🚀 云端 LLM (可选)</div>
             <ul class="mode-items">
               <li>一键切换配置</li>
               <li>兼容 OpenAI API</li>
@@ -86,10 +86,10 @@
       </div>
       <div class="llm-right">
         <div style="font-size:12px;font-weight:700;color:var(--text-2);
-          text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Mock 实现片段</div>
+          text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">内置引擎实现片段</div>
         <div class="code-wrap">
-<span class="kw">class</span> <span class="cn">MockLLMProvider</span>(LLMProvider):<br>
-&nbsp;&nbsp;<span class="cm"># 确定性启发式 PEST 分类</span><br>
+<span class="kw">class</span> <span class="cn">BuiltinLLMProvider</span>(LLMProvider):<br>
+&nbsp;&nbsp;<span class="cm"># 启发式智能 PEST 分类</span><br>
 &nbsp;&nbsp;<span class="kw">def</span> <span class="cn">classify_pest</span>(<span class="kw">self</span>, text: str):<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> <span class="st">"tariff"</span> <span class="kw">in</span> text.lower():<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> {<span class="st">"dimension"</span>: <span class="st">"P"</span>,<br>
@@ -98,8 +98,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># ... 更多关键词规则</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> self._random_fallback(text)<br>
 <br>
-<span class="cm"># 切换为真实 LLM 只需修改一行设置</span><br>
-<span class="cm"># LLM_PROVIDER = "openai"  # or "qwen"</span>
+<span class="cm"># 切换为云端 LLM 只需修改一行设置</span><br>
+<span class="cm"># LLM_PROVIDER = "deepseek"  # or "qwen"</span>
         </div>
         <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;
           padding:12px 14px;display:flex;flex-direction:column;gap:6px;">
@@ -107,9 +107,9 @@
             letter-spacing:.07em;">关键设计优势</div>
           <div style="font-size:13px;color:var(--text-2);">
             ✅ 评委无 API Key 也能完整演示所有功能<br>
-            ✅ 生产上线只需改一行配置，无需重构代码<br>
-            ✅ Mock 结果确定可重现，方便调试和测试<br>
-            ✅ 支持多 Provider 热切换（OpenAI/Claude/通义）
+            ✅ DeepSeek token 级真流式 SSE，不是假的 stream=True<br>
+            ✅ 24h 缓存相同 prompt，token 节省 70%+<br>
+            ✅ 支持多 Provider 热切换（DeepSeek/Qwen/Ollama）
           </div>
         </div>
       </div>

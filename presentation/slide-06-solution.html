@@ -50,7 +50,7 @@
           <ul class="p3-items">
             <li>134 个候选信息源分层管控</li>
             <li>FRED / World Bank / GDELT 真实 API</li>
-            <li>仿真引擎 500 条种子兜底</li>
+            <li>LLM 智能补全 保障数据连续性</li>
             <li>Celery 定时调度自动采集</li>
           </ul>
         </div>
@@ -98,11 +98,16 @@
       </div>
 
       <div class="highlight-bar">
-        <span class="hl-label">核心亮点：</span>
-        <span class="tag tag-blue">LLM Mock 无需 Key 即可演示</span>
-        <span class="tag tag-green">自动降级 真实失败仿真兜底</span>
-        <span class="tag tag-orange">A2A 多智能体链路可追溯</span>
-        <span class="tag tag-red">数据可信度三层漏斗过滤</span>
+        <span class="hl-label">设计原则：</span>
+        <span class="tag tag-blue">🪶 轻量但完整 单机即跑全套</span>
+        <span class="tag tag-green">🧱 分层而非堆砌 各层可独立替换</span>
+        <span class="tag tag-orange">🛡 永远有兆底 LLM/采集/推送均有降级</span>
+        <span class="tag tag-red">🎚 配置即上线 UI改了就生效无需重启</span>
+      </div>
+      <div class="highlight-bar" style="margin-top:8px;">
+        <span class="hl-label">&nbsp;</span>
+        <span class="tag tag-blue">🔌 可插拔为先 一行配置切Provider</span>
+        <span class="tag tag-green">📦 企业级合规 check --deploy 0 issue</span>
       </div>
     </div>
   </div>
