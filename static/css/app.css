@@ -1155,7 +1155,7 @@ select.select:focus {
 .feed-item .fi-idx {
   flex: 0 0 36px;
   display: flex; align-items: center; justify-content: center;
-  font: 600 16px/1 ui-monospace, "SF Mono", Menlo, monospace;
+  font: 400 12px/1 ui-monospace, "SF Mono", Menlo, monospace;
   color: var(--text-tertiary);
   font-variant-numeric: tabular-nums;
   user-select: none;
@@ -1929,7 +1929,7 @@ select.select:focus {
   grid-column: 1 / -1;
 }
 #tblSourcesBody .list-row.is-fetching::after {
-  animation: srcRowProgress 1.6s ease-out forwards;
+  animation: srcRowProgress var(--src-anim-dur, 1.6s) ease-out forwards;
 }
 @keyframes srcRowProgress {
   0%   { transform: scaleX(0); opacity: 1; }

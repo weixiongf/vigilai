@@ -50,8 +50,11 @@ def _worker(ids: list[int]) -> None:
     failed = 0
     lock = threading.Lock()
 
-    def _make_token_pusher(info_id: int):
-        """为某条情报创建一个节流的 on_token 回调 — 80ms 或 ≥8 token 批量刷出."""
+    def _make_pusher(info_id: int, event_type: str):
+        """为某条情报创建一个节流的回调 — 80ms 或 ≥8 token 批量刷出.
+
+        event_type: 'intel.token' (LLM 正文) 或 'intel.reasoning' (LLM 思考流)
+        """
         buffer: list[str] = []
         last_flush = [time.time()]
         idx = [0]
@@ -64,10 +67,11 @@ def _worker(ids: list[int]) -> None:
             buffer.clear()
             last_flush[0] = time.time()
             idx[0] += 1
-            logger.info('[batch.token] id=%s idx=%s len=%s sample=%r',
-                        info_id, idx[0], len(text), text[:30])
+            logger.info('[batch.%s] id=%s idx=%s len=%s sample=%r',
+                        event_type.split('.')[-1], info_id,
+                        idx[0], len(text), text[:30])
             _push({
-                'type': 'intel.token',
+                'type': event_type,
                 'id': info_id,
                 'token': text,
                 'idx': idx[0],
@@ -86,6 +90,12 @@ def _worker(ids: list[int]) -> None:
                 _flush()
 
         return cb, cb_finalize
+
+    def _make_token_pusher(info_id: int):
+        return _make_pusher(info_id, 'intel.token')
+
+    def _make_reasoning_pusher(info_id: int):
+        return _make_pusher(info_id, 'intel.reasoning')
 
     def _do(info_id: int) -> None:
         nonlocal success, failed
@@ -115,10 +125,15 @@ def _worker(ids: list[int]) -> None:
                 })
                 return
 
-            on_token, finalize = _make_token_pusher(info.id)
-            # 同步传入 on_token 回调, LLM 每输出一段 delta 就推 WebSocket
-            analyze_one(info, save=True, on_token=on_token)
-            finalize()  # 刷出末尾未达阈值的 buffer
+            on_token, tok_finalize = _make_token_pusher(info.id)
+            on_reasoning, rea_finalize = _make_reasoning_pusher(info.id)
+            # 同步传入 on_token / on_thinking 双回调:
+            # - 思考流 (deepseek-reasoner reasoning_content / <thinking>) → intel.reasoning
+            # - 正文流 (delta.content) → intel.token
+            analyze_one(info, save=True, on_token=on_token,
+                        on_thinking=on_reasoning)
+            rea_finalize()
+            tok_finalize()  # 刷出末尾未达阈值的 buffer
             # 分析成功后写缓存 (以 content_hash 为 key)
             try:
                 _save_cached_analysis(info)

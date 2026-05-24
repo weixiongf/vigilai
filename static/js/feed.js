@@ -522,8 +522,16 @@
     } else if (d.type === 'intel.token' && d.id && typeof d.token === 'string') {
       // 批量分析时 LLM 每输出一段 delta 的实时追加
       streamBuffer[d.id] = (streamBuffer[d.id] || '') + d.token;
-      // [临时注释] 按用户要求 — 不在列表行/抽屉内创建任何临时流式显示框
+      // 首个正文 token 抵达 → 抽屉插队展示该情报
+      if (window.SR_openIntel && currentId !== d.id) {
+        try { window.SR_openIntel(d.id); } catch (_) {}
+      }
       drawerSync('token', d.token);
+    } else if (d.type === 'intel.reasoning' && d.id && typeof d.token === 'string') {
+      // 思考流 — 仅走顶部外浮窗对应的 Tab，不进抽屉
+      if (window.SR_pushReasoning) {
+        try { window.SR_pushReasoning(d.id, d.token); } catch (_) {}
+      }
     } else if (d.type === 'intel.analyze_failed' && d.id) {
       aiStatus[d.id] = 'failed';
       updateRowStatus(d.id);
@@ -731,4 +739,20 @@
   setupBatchAnalyze();
 
   loadList();
+
+  // ============================================================
+  // 对外暴露 — feed.html 顶部多 Tab 浮窗 inline 脚本调用
+  //   · SR_openIntel(id)        : 以该 id 打开抽屉 (插队式, 不等当前动画)
+  //   · SR_closeDrawer()        : 关闭抽屉
+  //   · SR_streamBuffer        : 共享的 LLM token 累积区 (抽屉迟打开不丢 token)
+  //   · SR_pushReasoning(id,t) : 预留 hook — 思考流在浮窗处理, 本文件不发送
+  // ============================================================
+  window.SR_openIntel = function (id) {
+    if (!id) return;
+    const nid = parseInt(id);
+    if (currentId === nid) { openDrawer(); return; }
+    loadDetail(nid);
+  };
+  window.SR_closeDrawer = closeDrawer;
+  window.SR_streamBuffer = streamBuffer;
 })();

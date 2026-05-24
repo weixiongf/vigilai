@@ -223,6 +223,24 @@ def _make_url(base_title: str, source_name: str, suffix: str = '') -> str:
     return _snapshot_url(canonical, f'{base_title}|{suffix}')
 
 
+def _sanitize_published_at(published_at):
+    """夹紧 published_at, 防止采集器写入未来时间 (如 IMF/WB 预测数据).
+
+    - published_at 为 None / 非 datetime: 用 now() 兜底
+    - published_at > now(): 截断为 now() (例如 IMF 2031 预测 → 现在)
+    - 其它情况原样保留 (允许真实历史数据)
+    """
+    now = timezone.now()
+    if not isinstance(published_at, datetime):
+        return now
+    # 统一 timezone-aware
+    if published_at.tzinfo is None:
+        published_at = published_at.replace(tzinfo=_tz.utc)
+    if published_at > now:
+        return now
+    return published_at
+
+
 def _upsert_raw_info(source, title: str, content: str, url: str,
                      published_at: datetime, market: str, dimension: str) -> bool:
     """创建 RawInfo, 遇 unique 冲突返回 False (已存在)."""
@@ -233,7 +251,7 @@ def _upsert_raw_info(source, title: str, content: str, url: str,
             title=title[:499],
             content=content,
             url=url[:599],
-            published_at=published_at,
+            published_at=_sanitize_published_at(published_at),
             target_market=market,
             strategic_dimension=_normalize_dimension(dimension),
             is_simulated=False,
@@ -326,6 +344,9 @@ def crawl_world_bank(source) -> Tuple[int, int]:
             try:
                 pub_at = datetime.strptime(date_str, '%Y').replace(
                     month=12, day=31, tzinfo=_tz.utc)
+                # World Bank 可能返回包含预测的年份, 避免写入未来时间
+                if pub_at > timezone.now():
+                    pub_at = timezone.now()
             except Exception:
                 pub_at = timezone.now()
 
@@ -442,6 +463,10 @@ def crawl_imf(source) -> Tuple[int, int]:
                     continue
                 try:
                     pub_at = datetime(int(latest_year), 12, 31, tzinfo=_tz.utc)
+                    # IMF DataMapper 同时返回历史 + 未来预测年份 (如 2031),
+                    # 避免将预测年份写为 published_at 造成超未来时间
+                    if pub_at > timezone.now():
+                        pub_at = timezone.now()
                 except Exception:
                     pub_at = timezone.now()
                 title = f'[IMF] {country} {label}: {value} ({latest_year})'

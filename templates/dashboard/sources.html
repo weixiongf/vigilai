@@ -86,16 +86,24 @@
 
 {# ===================== 全宽列表 （详情在右侧抽屉） ===================== #}
 <div class="panel" style="margin-bottom:0;">
-  <div class="panel-h">
-    <h3>
+  <div class="panel-h" style="justify-content:flex-start;flex-wrap:nowrap;">
+    <h3 style="flex:1 1 auto;min-width:0;">
       <i class="ri-list-check"></i> 信息源列表
       <span id="srcCountTag" class="muted"
             style="font-weight:normal;font-size:var(--fz-sm);margin-left:2px;">（— 项）</span>
     </h3>
-    <a href="{% url 'dashboard:source_create' %}" class="btn btn-ghost btn-sm"
-       id="btnSrcAdd" title="添加信息源" style="margin-left:6px;">
-      <i class="ri-add-circle-line"></i> 添加信息源
-    </a>
+    <div class="panel-h-actions"
+         style="display:inline-flex;align-items:center;gap:6px;margin-left:auto;flex:0 0 auto;white-space:nowrap;">
+      <button type="button" class="btn btn-ghost btn-sm"
+              id="btnSrcBulkTrigger"
+              title="逐个触发列表中带绿色圆点的真实采集源（随机错峰下发，进度条瀑布式呈现）">
+        <i class="ri-play-list-line"></i> 批量触发
+      </button>
+      <a href="{% url 'dashboard:source_create' %}" class="btn btn-ghost btn-sm"
+         id="btnSrcAdd" title="添加信息源">
+        <i class="ri-add-circle-line"></i> 添加信息源
+      </a>
+    </div>
   </div>
   <div class="panel-body" style="display:flex; flex-direction:column;">
     {# Grid 列表 — 全宽下多维字段呈现 #}

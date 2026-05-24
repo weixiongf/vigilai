@@ -146,7 +146,7 @@
       const dotTitle = isReal ? '真实采集' : '仿真 / 未接入';
       const dot = `<span class="src-dot" title="${dotTitle}" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${dotColor};box-shadow:0 0 0 2px rgba(255,255,255,.04);"></span>`;
       return `
-      <div class="list-row${s.is_active ? '' : ' row-inactive'}" data-id="${s.id}" style="${cols}">
+      <div class="list-row${s.is_active ? '' : ' row-inactive'}" data-id="${s.id}" data-real="${isReal ? 1 : 0}" style="${cols}">
         <span class="idx">${String(idx + 1).padStart(2, '0')}</span>
         <div style="display:flex;align-items:center;justify-content:center;">${dot}</div>
         <div class="src-name-cell">
@@ -347,6 +347,68 @@
   // ---------- 工具栏交互 ----------
   $('#btnSrcSearch').onclick = loadSources;
   const btnReload = $('#btnSrcReload'); if (btnReload) btnReload.onclick = () => { loadOverview(); loadSources(); };
+
+  // ---------- 批量触发：逐个下发真实采集源（随机错峰，进度条瀑布式呈现）----------
+  const btnBulk = $('#btnSrcBulkTrigger');
+  if (btnBulk) {
+    let _bulkRunning = false;
+    btnBulk.addEventListener('click', async () => {
+      if (_bulkRunning) return;
+      const rows = Array.from(
+        document.querySelectorAll('#tblSourcesBody .list-row[data-id][data-real="1"]')
+      ).filter(r => !r.classList.contains('row-inactive'));
+      if (!rows.length) {
+        return toast('当前列表中没有可触发的真实采集源', 'warn');
+      }
+      _bulkRunning = true;
+      btnBulk.disabled = true;
+      const origHtml = btnBulk.innerHTML;
+      let okCnt = 0, errCnt = 0;
+      let maxAnim = 0; // 记录最后一条动画的预计收尾时间
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const id = Number(row.dataset.id);
+        btnBulk.innerHTML =
+          `<i class="ri-loader-4-line"></i> 触发中 ${i + 1}/${rows.length}`;
+
+        // 每行进度条动画时长随机：700～2400ms，有快有慢
+        const animMs = 700 + Math.random() * 1700;
+        row.classList.remove('is-fetching');
+        // 传递随机动画时长给 ::after 伪元素（通过 CSS 变量）
+        row.style.setProperty('--src-anim-dur', animMs + 'ms');
+        void row.offsetWidth;
+        row.classList.add('is-fetching');
+        setTimeout(() => {
+          row.classList.remove('is-fetching');
+          row.style.removeProperty('--src-anim-dur');
+        }, animMs + 60);
+        if (animMs > maxAnim) maxAnim = animMs;
+
+        // 异步下发：逐条弹 toast，成功/失败都只弹该条本身，不做汇总
+        const _name = (row.querySelector('.src-name-cell b')?.textContent || `#${id}`).trim();
+        api(`/api/sources/${id}/trigger/`, { method: 'POST' })
+          .then(() => { okCnt++; toast(`已触发：${_name}`, 'success'); })
+          .catch((e) => { errCnt++; toast(`触发失败：${_name}·${e.message || ''}`, 'error'); });
+
+        // 下发间隔（整体节奏更快）：15% 连发、 15% 犹豫、 70% 常规
+        let step;
+        const r = Math.random();
+        if (r < 0.15)      step =  30 + Math.random() *  70;   //  30–100ms 连发
+        else if (r > 0.85) step = 320 + Math.random() * 380;   // 320–700ms 犹豫
+        else               step =  90 + Math.random() * 200;   //  90–290ms 常规
+        await new Promise(r2 => setTimeout(r2, step));
+      }
+      // 等待最后一条进度条收尾
+      await new Promise(r => setTimeout(r, maxAnim + 100));
+      btnBulk.innerHTML = origHtml;
+      btnBulk.disabled = false;
+      _bulkRunning = false;
+      // 不再弹汇总 toast——逐条提示在过程中已下发
+      // 收尾刷新一次详情/概览
+      loadOverview();
+      if (currentSourceId) loadDetail(currentSourceId);
+    });
+  }
   ['srcType', 'srcPriority', 'srcActive'].forEach(id =>
     $('#' + id).addEventListener('change', loadSources));
   $('#srcQ').addEventListener('keyup', e => { if (e.key === 'Enter') loadSources(); });

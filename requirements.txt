@@ -1,0 +1,129 @@
+# ============================================================
+# Strategic Radar — Python 依赖锁定 (pip freeze 输出)
+# 安装方式:
+#   python -m venv .venv
+#   .venv\Scripts\activate          (Windows)
+#   source .venv/bin/activate       (Linux / macOS)
+#   pip install -r requirements.txt
+# ============================================================
+
+# --- Web 框架与 ASGI ---
+Django==4.2.30
+asgiref==3.11.1
+channels==4.3.2
+channels_redis==4.3.0
+daphne==4.2.1
+djangorestframework==3.17.1
+django-cors-headers==4.9.0
+sqlparse==0.5.5
+python-decouple==3.8
+
+# --- 异步任务与消息队列 ---
+celery==5.6.3
+redis==6.4.0
+amqp==5.3.1
+billiard==4.2.4
+kombu==5.6.2
+vine==5.1.0
+click==8.4.0
+click-didyoumean==0.3.1
+click-plugins==1.1.1.2
+click-repl==0.3.0
+prompt_toolkit==3.0.52
+
+# --- 数据库 ---
+psycopg2-binary==2.9.12
+
+# --- 网络 / HTTP / TLS ---
+certifi==2026.5.20
+charset-normalizer==3.4.7
+idna==3.16
+requests==2.34.2
+requests-file==3.0.1
+urllib3==2.7.0
+h11==0.16.0
+httpcore==1.0.9
+httpx==0.28.1
+anyio==4.13.0
+async-timeout==5.0.1
+
+# --- HTML / XML / RSS 解析 ---
+beautifulsoup4==4.14.3
+soupsieve==2.8.3
+cssselect==1.4.0
+defusedxml==0.7.1
+lxml==6.1.1
+parsel==1.11.0
+w3lib==2.4.1
+tld==0.13.2
+tldextract==5.3.1
+
+# --- 加密 / 安全 ---
+cryptography==48.0.0
+pyOpenSSL==26.2.0
+pyasn1==0.6.3
+pyasn1_modules==0.4.2
+service-identity==24.2.0
+cffi==2.0.0
+pycparser==3.0
+attrs==26.1.0
+
+# --- 序列化 / 数据 ---
+orjson==3.11.9
+PyYAML==6.0.3
+msgpack==1.1.2
+numpy==2.2.6
+
+# --- 爬虫 (Scrapy + Playwright) ---
+Scrapy==2.16.0
+scrapy-playwright==0.0.46
+playwright==1.60.0
+pyee==13.0.1
+greenlet==3.5.1
+itemadapter==0.13.1
+itemloaders==1.4.0
+jmespath==1.1.0
+queuelib==1.9.0
+Protego==0.6.0
+PyDispatcher==2.0.7
+Twisted==26.4.0
+autobahn==24.4.2
+Automat==25.4.16
+constantly==23.10.4
+hyperlink==21.0.0
+Incremental==24.11.0
+txaio==25.9.2
+zope.interface==8.4
+
+# --- 反指纹/反检测 (爬虫增强) ---
+scrapling==0.4.8
+camoufox==0.4.11
+browserforge==1.2.4
+apify_fingerprint_datapoints==0.13.0
+curl_cffi==0.15.0
+ua-parser==1.0.2
+ua-parser-builtins==202605
+language-tags==1.3.1
+PySocks==1.7.1
+screeninfo==0.8.1
+
+# --- 时间 / 工具 ---
+python-dateutil==2.9.0.post0
+six==1.17.0
+tzdata==2026.2
+tzlocal==5.3.1
+packaging==26.2
+filelock==3.29.0
+platformdirs==4.9.6
+tqdm==4.67.3
+exceptiongroup==1.3.1
+typing_extensions==4.15.0
+tomli==2.4.1
+wcwidth==0.7.0
+colorama==0.4.6
+
+# --- 终端美化 (用于 manage.py 输出) ---
+rich==15.0.0
+markdown-it-py==4.2.0
+mdurl==0.1.2
+Pygments==2.20.0

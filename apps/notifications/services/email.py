@@ -170,8 +170,9 @@ def send_html_email(
             and 'filebased' in connection.__class__.__module__
         )
         simulated = is_file
-        # 运行时阶段: 同一连接重试 1 次 (间隔 1.2s) — 减轻偏发断连
-        attempts = 2 if (not is_file and prefer == 'runtime') else 1
+        # 真实 SMTP 阶段: 同一连接失败后重建连接重试 1 次 (间隔 1.2s) — 消化 QQ 偶发断连
+        # 运行时与 .env 兜底两条路径都需要重试; 仅 filebased 后端无需重试 (落盘必成功)
+        attempts = 1 if is_file else 2
         for attempt in range(attempts):
             msg = EmailMultiAlternatives(
                 subject=subject[:200],
