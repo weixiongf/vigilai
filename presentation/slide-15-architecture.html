@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>技术架构 · Strategic Radar</title>
+<title>技术架构 · VigilAI</title>
 <link rel="stylesheet" href="assets/css/common.css">
 <style>
 .arch-wrap{display:grid;grid-template-columns:1fr 300px;gap:20px;flex:1;}
@@ -34,7 +34,7 @@
 <body>
 <div class="slide">
   <div class="slide-header">
-    <div class="slide-logo"><span class="dot"></span> Strategic Radar</div>
+    <div class="slide-logo"><span class="dot"></span> VigilAI</div>
     <div id="slideChapter" class="slide-chapter muted"></div>
     <div id="slideNum" class="slide-num"></div>
   </div>
@@ -56,7 +56,7 @@
         <div class="arch-layer al-2">
           <div class="al-label">业务层 · Application</div>
           <div class="al-items">
-            <span class="al-item">Django 5.x</span>
+            <span class="al-item">Django 4.2</span>
             <span class="al-item">7 个 App 模块</span>
             <span class="al-item">A2A 多智能体</span>
             <span class="al-item">LLM Provider</span>
@@ -68,7 +68,7 @@
         <div class="arch-layer al-3">
           <div class="al-label">数据层 · Data</div>
           <div class="al-items">
-            <span class="al-item">PostgreSQL 16</span>
+            <span class="al-item">PostgreSQL 14+</span>
             <span class="al-item">Redis (Broker)</span>
             <span class="al-item">Django ORM</span>
             <span class="al-item">Channel Layers</span>
@@ -91,10 +91,10 @@
           <div class="tech-title">核心技术栈</div>
           <div class="tech-rows">
             <div class="tech-row"><div class="dot-b"></div><span class="tech-name">Python</span><span class="tech-val">3.11+</span></div>
-            <div class="tech-row"><div class="dot-b"></div><span class="tech-name">Django</span><span class="tech-val">5.x + DRF</span></div>
+            <div class="tech-row"><div class="dot-b"></div><span class="tech-name">Django</span><span class="tech-val">4.2 + DRF</span></div>
             <div class="tech-row"><div class="dot-o"></div><span class="tech-name">Celery</span><span class="tech-val">5.x · 8 定时任务</span></div>
             <div class="tech-row"><div class="dot-g"></div><span class="tech-name">Channels</span><span class="tech-val">4.x WebSocket</span></div>
-            <div class="tech-row"><div class="dot-g"></div><span class="tech-name">PostgreSQL</span><span class="tech-val">16 · 本地部署</span></div>
+            <div class="tech-row"><div class="dot-g"></div><span class="tech-name">PostgreSQL</span><span class="tech-val">14+ · 本地部署</span></div>
             <div class="tech-row"><div class="dot-o"></div><span class="tech-name">Redis</span><span class="tech-val">Broker + Cache</span></div>
           </div>
         </div>
@@ -119,7 +119,7 @@
   <div class="slide-footer">
     <span>← → 键盘翻页</span>
     <div class="progress-bar"><div class="progress-bar-fill"></div></div>
-    <span>Strategic Radar · 2026</span>
+    <span>VigilAI · 2026</span>
   </div>
 </div>
 <script src="assets/js/common.js"></script>

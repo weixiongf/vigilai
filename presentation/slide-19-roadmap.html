@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>产品路线图 · Strategic Radar</title>
+<title>产品路线图 · VigilAI</title>
 <link rel="stylesheet" href="assets/css/common.css">
 <style>
 .road-wrap{flex:1;display:flex;flex-direction:column;gap:14px;}
@@ -40,7 +40,7 @@
 <body>
 <div class="slide">
   <div class="slide-header">
-    <div class="slide-logo"><span class="dot"></span> Strategic Radar</div>
+    <div class="slide-logo"><span class="dot"></span> VigilAI</div>
     <div id="slideChapter" class="slide-chapter muted"></div>
     <div id="slideNum" class="slide-num"></div>
   </div>
@@ -74,53 +74,53 @@
         <div class="road-card phase-done">
           <div class="rc-phase">Phase 0 · 已完成</div>
           <div class="rc-title">基础架构搭建</div>
-          <div class="rc-time">2026 Q2 黑客松前</div>
+          <div class="rc-time">2026-05-23 前</div>
           <ul class="rc-items">
-            <li><span class="ico">✅</span>Django + Celery + Channels 框架</li>
-            <li><span class="ico">✅</span>113 个信息源注册</li>
-            <li><span class="ico">✅</span>仿真引擎 500 条种子</li>
-            <li><span class="ico">✅</span>PEST / SWOT 分析模块</li>
-            <li><span class="ico">✅</span>8 页驾驶舱前端</li>
-            <li><span class="ico">✅</span>A2A 多智能体框架</li>
+            <li><span class="ico">✅</span>Django 4.2 + Celery + Channels 框架</li>
+            <li><span class="ico">✅</span>134 个候选信息源注册</li>
+            <li><span class="ico">✅</span>仿真引擎 500+ 条种子情报</li>
+            <li><span class="ico">✅</span>PEST / SWOT / 4 维评分模块</li>
+            <li><span class="ico">✅</span>8 页驾驶舱前端 + WebSocket</li>
+            <li><span class="ico">✅</span>A2A 四节点多智能体框架</li>
           </ul>
         </div>
         <div class="road-card phase-now">
           <div class="rc-phase">Phase 1 · 黑客松 MVP</div>
-          <div class="rc-title">可演示完整链路</div>
-          <div class="rc-time">2026 Q2 黑客松现场</div>
+          <div class="rc-title">全链路真实跑通</div>
+          <div class="rc-time">2026-05-23 ~ 24（26h）</div>
           <ul class="rc-items">
-            <li><span class="ico">✅</span>FRED / World Bank / GDELT 真实 API</li>
-            <li><span class="ico">✅</span>FDA / FTC / USTR / EU Commission 法规 RSS</li>
-            <li><span class="ico">✅</span>Amazon Seller / eBay / Shopify 平台政策</li>
-            <li><span class="ico">✅</span>DeepSeek 真流式 LLM + Mock 降级 + 结果缓存 24h</li>
-            <li><span class="ico">✅</span>飞书 + 邮件 + WebSocket 推送 + 24h 幂等去重</li>
-            <li><span class="ico">✅</span>Redis 分布式锁 + /healthz 健康检查</li>
-            <li><span class="ico">⚡</span>多智能体控制台前端</li>
-            <li><span class="ico">⚡</span>完整 20 页演示文稿</li>
+            <li><span class="ico">✅</span>18 个真实采集函数（FRED / World Bank / GDELT …）</li>
+            <li><span class="ico">✅</span>FDA / FTC / USTR / EU 法规 RSS 接入</li>
+            <li><span class="ico">✅</span>DeepSeek 真流式 SSE + Mock 降级 + 24h 缓存</li>
+            <li><span class="ico">✅</span>飞书 + 邮件 + WebSocket + 24h 幂等去重</li>
+            <li><span class="ico">✅</span>Redis 分布式锁 + /healthz 五子系探活</li>
+            <li><span class="ico">✅</span>智能体控制台 Canvas 画布</li>
+            <li><span class="ico">✅</span>20 页 HTML 路演文稿</li>
+            <li><span class="ico">✅</span>check --deploy 0 issue 生产安全</li>
           </ul>
         </div>
         <div class="road-card phase-next">
           <div class="rc-phase">Phase 2 · 商业验证</div>
-          <div class="rc-title">真实数据流上线</div>
+          <div class="rc-title">多租户与自动化</div>
           <div class="rc-time">2026 Q3 ~ Q4</div>
           <ul class="rc-items">
-            <li><span class="ico">🔜</span>GDELT / Reddit / NewsAPI 全量接入</li>
-            <li><span class="ico">🔜</span>切换真实 LLM（通义千问/GPT）</li>
-            <li><span class="ico">🔜</span>多租户 + 团队订阅模式</li>
-            <li><span class="ico">🔜</span>自定义监控关键词</li>
-            <li><span class="ico">🔜</span>移动端 / 微信小程序</li>
+            <li><span class="ico">🔜</span>多租户 + 团队协作订阅模式</li>
+            <li><span class="ico">🔜</span>自定义监控关键词 / 行业配置</li>
+            <li><span class="ico">🔜</span>SWOT 策略 LLM 二次润色</li>
+            <li><span class="ico">🔜</span>Docker 容器化 + CI/CD 流水线</li>
+            <li><span class="ico">🔜</span>移动端 / 微信小程序推送</li>
           </ul>
         </div>
         <div class="road-card phase-far">
           <div class="rc-phase">Phase 3 · 规模化</div>
-          <div class="rc-title">Agent 驱动的情报平台</div>
+          <div class="rc-title">Agent 驱动情报平台</div>
           <div class="rc-time">2027+</div>
           <ul class="rc-items">
-            <li><span class="ico">🚀</span>Agent 自动调研课题</li>
-            <li><span class="ico">🚀</span>行业大模型微调</li>
-            <li><span class="ico">🚀</span>多模态情报（视频/直播）</li>
-            <li><span class="ico">🚀</span>出海企业 SaaS 平台</li>
-            <li><span class="ico">🚀</span>全球 100+ 市场覆盖</li>
+            <li><span class="ico">🚀</span>Agent 自动调研课题生成</li>
+            <li><span class="ico">🚀</span>行业垂类大模型微调</li>
+            <li><span class="ico">🚀</span>多模态情报（视频 / 直播）</li>
+            <li><span class="ico">🚀</span>出海企业 SaaS 标准产品</li>
+            <li><span class="ico">🚀</span>全球 100+ 市场全覆盖</li>
           </ul>
         </div>
       </div>
@@ -129,7 +129,7 @@
   <div class="slide-footer">
     <span>← → 键盘翻页</span>
     <div class="progress-bar"><div class="progress-bar-fill"></div></div>
-    <span>Strategic Radar · 2026</span>
+    <span>VigilAI · 2026</span>
   </div>
 </div>
 <script src="assets/js/common.js"></script>

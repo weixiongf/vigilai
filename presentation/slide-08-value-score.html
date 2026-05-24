@@ -2,135 +2,190 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>价值评分 · Strategic Radar</title>
+<title>数据可信度评判 · VigilAI</title>
 <link rel="stylesheet" href="assets/css/common.css">
 <style>
-.score-layout{display:grid;grid-template-columns:1fr 1.2fr;gap:24px;flex:1;}
-.score-left{display:flex;flex-direction:column;gap:14px;}
-.formula-box{background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(245,158,11,.06));
-  border:1px solid rgba(37,99,235,.3);border-radius:14px;padding:20px 22px;}
-.formula-label{font-size:11px;font-weight:700;color:var(--text-2);
-  text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;}
-.formula-text{font-size:15px;font-family:monospace;color:#93C5FD;line-height:1.8;}
-.formula-text .orange{color:#FCD34D;}
-.weight-bars{display:flex;flex-direction:column;gap:9px;}
-.w-row{display:flex;align-items:center;gap:10px;}
-.w-label{width:60px;font-size:13px;color:var(--text-2);flex-shrink:0;}
-.w-bar-bg{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
-.w-bar-fill{height:100%;border-radius:4px;}
-.w-val{width:24px;font-size:12px;color:var(--text-2);text-align:right;flex-shrink:0;}
-.score-right{display:flex;flex-direction:column;gap:12px;}
-.threshold-title{font-size:14px;font-weight:700;color:var(--text-2);
-  text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
-.thresh-item{display:flex;align-items:center;gap:12px;padding:10px 14px;
-  background:var(--bg-card);border:1px solid var(--border);border-radius:9px;}
-.thresh-range{font-size:22px;font-weight:800;min-width:50px;}
-.thresh-label{font-size:15px;font-weight:700;}
-.thresh-desc{font-size:13px;color:var(--text-2);}
-.thresh-action{margin-left:auto;font-size:12px;padding:3px 10px;border-radius:10px;}
-.example-box{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
-.ex-label{font-size:11px;color:var(--text-2);font-weight:700;text-transform:uppercase;margin-bottom:8px;}
-.ex-item{display:flex;align-items:center;gap:8px;font-size:13px;padding:4px 0;}
-.ex-title{flex:1;color:var(--text-2);}
-.ex-score{font-size:16px;font-weight:800;color:var(--accent);min-width:28px;text-align:right;}
+.cred-layout{display:grid;grid-template-columns:1fr 1fr;gap:24px;flex:1;}
+.cred-left,.cred-right{display:flex;flex-direction:column;gap:14px;}
+
+/* 三层漏斗 */
+.funnel{display:flex;flex-direction:column;gap:12px;}
+.funnel-step{display:flex;align-items:flex-start;gap:14px;
+  padding:12px 16px;border-radius:10px;
+  background:var(--bg-card);border:1px solid var(--border);}
+.funnel-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;color:#fff;}
+.funnel-num.l1{background:linear-gradient(135deg,#3b82f6,#1d4ed8);}
+.funnel-num.l2{background:linear-gradient(135deg,#f59e0b,#d97706);}
+.funnel-num.l3{background:linear-gradient(135deg,#10b981,#047857);}
+.funnel-title{font-size:18px;font-weight:700;color:var(--text-1);margin-bottom:3px;}
+.funnel-desc{font-size:14px;color:var(--text-2);line-height:1.5;}
+.funnel-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;}
+.ftag{font-size:11px;padding:3px 9px;border-radius:8px;
+  background:rgba(37,99,235,.1);color:#93c5fd;border:1px solid rgba(37,99,235,.2);}
+
+/* 权威性关键词 */
+.auth-box{background:var(--bg-card);border:1px solid var(--border);
+  border-radius:10px;padding:14px 16px;}
+.auth-title{font-size:14px;font-weight:700;color:var(--text-2);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+.auth-grid{display:flex;flex-wrap:wrap;gap:6px;}
+.auth-chip{font-size:13px;padding:4px 10px;border-radius:6px;
+  background:rgba(16,185,129,.1);color:#6ee7b7;border:1px solid rgba(16,185,129,.2);}
+
+/* 企业关键数据 */
+.priority-section h3{font-size:22px;margin-bottom:10px;}
+.priority-grid{display:flex;flex-direction:column;gap:10px;}
+.prio-item{display:flex;align-items:center;gap:12px;
+  padding:10px 14px;border-radius:10px;
+  background:var(--bg-card);border:1px solid var(--border);}
+.prio-icon{font-size:20px;flex-shrink:0;}
+.prio-body{flex:1;}
+.prio-name{font-size:16px;font-weight:700;color:var(--text-1);}
+.prio-reason{font-size:14px;color:var(--text-2);margin-top:2px;}
+.prio-badge{font-size:12px;padding:3px 10px;border-radius:8px;font-weight:700;flex-shrink:0;}
+.prio-badge.crit{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3);}
+.prio-badge.high{background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3);}
+
+/* 评分公式简要 */
+.formula-mini{background:linear-gradient(135deg,rgba(37,99,235,.08),rgba(245,158,11,.04));
+  border:1px solid rgba(37,99,235,.2);border-radius:10px;padding:12px 16px;}
+.formula-mini .fm-label{font-size:13px;font-weight:700;color:var(--text-2);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.formula-mini code{font-size:15px;color:#93c5fd;line-height:1.7;display:block;}
+.formula-mini code .w{color:#fcd34d;font-weight:700;}
 </style>
 </head>
 <body>
 <div class="slide">
   <div class="slide-header">
-    <div class="slide-logo"><span class="dot"></span> Strategic Radar</div>
+    <div class="slide-logo"><span class="dot"></span> VigilAI</div>
     <div id="slideChapter" class="slide-chapter muted"></div>
     <div id="slideNum" class="slide-num"></div>
   </div>
   <div class="slide-body">
-    <h2 style="margin-bottom:6px;">4 维价值评分模型</h2>
-    <p class="muted" style="margin-bottom:16px;">将每条情报量化为 0-10 分，自动区分战略信号与噪声</p>
-    <div class="score-layout">
-      <div class="score-left">
-        <div class="formula-box">
-          <div class="formula-label">评分公式</div>
-          <div class="formula-text">
-            score = <span class="orange">4</span>·相关度<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="orange">3</span>·紧迫度<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="orange">2</span>·权威性<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="orange">1</span>·规模影响<br>
-            <span style="color:var(--text-2);font-size:13px;">（最高 10 分，自动归一化）</span>
+    <h2 style="margin-bottom:4px;">数据可信度评判 <span class="muted">·</span> 三层过滤漏斗</h2>
+    <p class="muted" style="margin-bottom:12px;font-size:16px;">从源头信誉到内容权威性，层层筛选确保战略决策建立在高可信数据之上</p>
+
+    <div class="cred-layout">
+      <!-- 左列：三层漏斗 + 权威性识别 -->
+      <div class="cred-left">
+        <div class="funnel">
+          <div class="funnel-step">
+            <div class="funnel-num l1">1</div>
+            <div>
+              <div class="funnel-title">源头准入筛选</div>
+              <div class="funnel-desc">
+                信息源按 <strong>访问层级</strong>（免费/注册/付费）+<strong>优先级</strong>（🔴关键/🟠高/🟡中/🟢低）分级注册；<br>
+                系统管理员可按开关控制各层级是否进入采集队列，从源头拦截低质数据
+              </div>
+              <div class="funnel-tags">
+                <span class="ftag">access_tier 三级过滤</span>
+                <span class="ftag">priority 四级排序</span>
+                <span class="ftag">URL 去重</span>
+              </div>
+            </div>
+          </div>
+          <div class="funnel-step">
+            <div class="funnel-num l2">2</div>
+            <div>
+              <div class="funnel-title">LLM 四维可信度评分</div>
+              <div class="funnel-desc">
+                每条入库情报由 LLM 独立打分：<strong>相关度</strong>(0-4) + <strong>紧迫度</strong>(0-3) + <strong>权威性</strong>(0-2) + <strong>规模</strong>(0-1) = 综合影响分(0-10)
+              </div>
+              <div class="funnel-tags">
+                <span class="ftag">DeepSeek 真实评估</span>
+                <span class="ftag">Mock 启发式兜底</span>
+                <span class="ftag">分数裁剪防溢出</span>
+              </div>
+            </div>
+          </div>
+          <div class="funnel-step">
+            <div class="funnel-num l3">3</div>
+            <div>
+              <div class="funnel-title">阈值分级 & 噪声丢弃</div>
+              <div class="funnel-desc">
+                <strong>≥8 关键</strong> → 立即飞书+邮件告警 &nbsp;|&nbsp;
+                <strong>5-7 中值</strong> → 进简报 &nbsp;|&nbsp;
+                <strong>3-4 低值</strong> → 存档备查 &nbsp;|&nbsp;
+                <strong>&lt;3 噪声</strong> → 自动丢弃并反馈黑名单
+              </div>
+            </div>
           </div>
         </div>
-        <div>
-          <div class="threshold-title" style="margin-bottom:8px;">权重分配</div>
-          <div class="weight-bars">
-            <div class="w-row">
-              <span class="w-label">相关度</span>
-              <div class="w-bar-bg"><div class="w-bar-fill" style="width:40%;background:#60A5FA;"></div></div>
-              <span class="w-val">×4</span>
-            </div>
-            <div class="w-row">
-              <span class="w-label">紧迫度</span>
-              <div class="w-bar-bg"><div class="w-bar-fill" style="width:30%;background:#F59E0B;"></div></div>
-              <span class="w-val">×3</span>
-            </div>
-            <div class="w-row">
-              <span class="w-label">权威性</span>
-              <div class="w-bar-bg"><div class="w-bar-fill" style="width:20%;background:#10B981;"></div></div>
-              <span class="w-val">×2</span>
-            </div>
-            <div class="w-row">
-              <span class="w-label">规模</span>
-              <div class="w-bar-bg"><div class="w-bar-fill" style="width:10%;background:#A78BFA;"></div></div>
-              <span class="w-val">×1</span>
-            </div>
+
+        <!-- 权威性关键词 -->
+        <div class="auth-box">
+          <div class="auth-title">权威性识别关键词库</div>
+          <div class="auth-grid">
+            <span class="auth-chip">央行</span>
+            <span class="auth-chip">海关总署</span>
+            <span class="auth-chip">政府公报</span>
+            <span class="auth-chip">Reuters</span>
+            <span class="auth-chip">Fed / ECB</span>
+            <span class="auth-chip">BLS / BEA</span>
+            <span class="auth-chip">SEC / FTC</span>
+            <span class="auth-chip">欧盟委员会</span>
+            <span class="auth-chip">白皮书</span>
+            <span class="auth-chip">World Bank</span>
           </div>
         </div>
       </div>
-      <div class="score-right">
-        <div class="threshold-title">阈值分级</div>
-        <div class="thresh-item">
-          <span class="thresh-range" style="color:#EF4444;">≥ 8</span>
-          <div>
-            <div class="thresh-label" style="color:#EF4444;">🔴 关键情报</div>
-            <div class="thresh-desc">立即触发高影响告警推送，飞书+邮件通知</div>
+
+      <!-- 右列：企业关键数据 + 评分公式 -->
+      <div class="cred-right">
+        <div class="priority-section">
+          <h3>企业战略决策最关键的数据</h3>
+          <div class="priority-grid">
+            <div class="prio-item">
+              <div class="prio-icon">⚖️</div>
+              <div class="prio-body">
+                <div class="prio-name">法规政策变动</div>
+                <div class="prio-reason">关税/合规/制裁 — 直接影响市场准入与成本结构</div>
+              </div>
+              <span class="prio-badge crit">最高优先</span>
+            </div>
+            <div class="prio-item">
+              <div class="prio-icon">📊</div>
+              <div class="prio-body">
+                <div class="prio-name">宏观经济指标</div>
+                <div class="prio-reason">CPI/利率/汇率/GDP — 影响定价策略与库存规划</div>
+              </div>
+              <span class="prio-badge crit">最高优先</span>
+            </div>
+            <div class="prio-item">
+              <div class="prio-icon">🏁</div>
+              <div class="prio-body">
+                <div class="prio-name">竞争对手动态</div>
+                <div class="prio-reason">新品/并购/退出 — 决定差异化定位与资源投放</div>
+              </div>
+              <span class="prio-badge high">高优先</span>
+            </div>
+            <div class="prio-item">
+              <div class="prio-icon">🛒</div>
+              <div class="prio-body">
+                <div class="prio-name">平台规则变更</div>
+                <div class="prio-reason">佣金/流量/合规 — 影响渠道收入和运营模式</div>
+              </div>
+              <span class="prio-badge high">高优先</span>
+            </div>
+            <div class="prio-item">
+              <div class="prio-icon">🌐</div>
+              <div class="prio-body">
+                <div class="prio-name">供应链/地缘风险</div>
+                <div class="prio-reason">港口/运输/制裁 — 影响履约时效与替代方案选择</div>
+              </div>
+              <span class="prio-badge high">高优先</span>
+            </div>
           </div>
-          <span class="thresh-action tag tag-red">高影响告警</span>
         </div>
-        <div class="thresh-item">
-          <span class="thresh-range" style="color:#F59E0B;">5-7</span>
-          <div>
-            <div class="thresh-label" style="color:#F59E0B;">🟡 中价值情报</div>
-            <div class="thresh-desc">进入 Daily 简报，按分数排序展示</div>
-          </div>
-          <span class="thresh-action tag tag-orange">进简报</span>
-        </div>
-        <div class="thresh-item">
-          <span class="thresh-range" style="color:#94A3B8;">3-4</span>
-          <div>
-            <div class="thresh-label">⚪ 低价值情报</div>
-            <div class="thresh-desc">存档备查，不主动展示，可按需检索</div>
-          </div>
-          <span class="thresh-action tag tag-gray">存档</span>
-        </div>
-        <div class="thresh-item">
-          <span class="thresh-range" style="color:rgba(148,163,184,.4);">&lt; 3</span>
-          <div>
-            <div class="thresh-label" style="color:var(--text-2);">🗑 噪声</div>
-            <div class="thresh-desc">自动丢弃，反馈到过滤黑名单</div>
-          </div>
-          <span class="thresh-action tag tag-gray">丢弃</span>
-        </div>
-        <div class="example-box">
-          <div class="ex-label">示例评分</div>
-          <div class="ex-item">
-            <span class="ex-title">美国加征关税 25% — 直接影响出口</span>
-            <span class="ex-score" style="color:#EF4444;">9.2</span>
-          </div>
-          <div class="ex-item">
-            <span class="ex-title">TikTok Shop 调整佣金费率</span>
-            <span class="ex-score" style="color:#F59E0B;">7.1</span>
-          </div>
-          <div class="ex-item">
-            <span class="ex-title">某竞品发布新品（相关度低）</span>
-            <span class="ex-score" style="color:#94A3B8;">3.4</span>
-          </div>
+
+        <div class="formula-mini">
+          <div class="fm-label">综合影响分计算</div>
+          <code>
+            impact = <span class="w">4</span>·相关度 + <span class="w">3</span>·紧迫度 + <span class="w">2</span>·权威性 + <span class="w">1</span>·规模<br>
+            <span style="color:var(--text-2);font-size:11px;">权威性系数越高 → 可信度越强 → 影响分越高 → 越优先推送</span>
+          </code>
         </div>
       </div>
     </div>
@@ -138,7 +193,7 @@
   <div class="slide-footer">
     <span>← → 键盘翻页</span>
     <div class="progress-bar"><div class="progress-bar-fill"></div></div>
-    <span>Strategic Radar · 2026</span>
+    <span>VigilAI · 2026</span>
   </div>
 </div>
 <script src="assets/js/common.js"></script>

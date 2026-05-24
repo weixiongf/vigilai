@@ -3,389 +3,193 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1280">
-<title>Strategic Radar — 致谢 & 团队</title>
+<title>VigilAI — 致谢 & 联系</title>
 <link rel="stylesheet" href="assets/css/common.css">
 <style>
-/* ===== Slide-20 专属样式 ===== */
-.final-wrap {
+.final-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: center;
+}
+
+/* 左侧：品牌 + 信息 */
+.final-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand-icon {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary), #1d4ed8);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 20px rgba(37,99,235,.5);
+}
+.brand-name {
+  font-size: 1.6rem; font-weight: 800; color: #fff; letter-spacing: .04em;
+}
+.brand-tagline {
+  font-size: .85rem; color: var(--accent); letter-spacing: .1em;
+  font-style: italic; text-align: center;
+}
+
+.author-card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px;
+  padding: 20px 28px;
+  text-align: center;
+  width: 100%;
+  max-width: 360px;
+}
+.author-name {
+  font-size: 1.3rem; font-weight: 700; color: #f0f4ff; margin-bottom: 4px;
+}
+.author-role {
+  font-size: .8rem; color: var(--accent); font-weight: 600;
+  letter-spacing: .06em; text-transform: uppercase; margin-bottom: 12px;
+}
+.author-tags {
+  display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 14px;
+}
+.atag {
+  font-size: .7rem; padding: 3px 10px; border-radius: 10px;
+  background: rgba(37,99,235,.15); color: #93c5fd;
+  border: 1px solid rgba(37,99,235,.25);
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+  max-width: 360px;
+}
+.info-cell {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 8px;
+  padding: 8px 10px;
+  text-align: center;
+}
+.info-cell .ic-label { font-size: .65rem; color: rgba(255,255,255,.4); }
+.info-cell .ic-value { font-size: .75rem; color: #e2e8f0; font-weight: 500; margin-top: 2px; }
+
+.thanks-line {
+  font-size: .78rem; color: rgba(255,255,255,.4); text-align: center;
+  font-style: italic; margin-top: 8px;
+}
+.thanks-line strong { color: var(--accent); font-style: normal; }
+
+/* 右侧：微信二维码 */
+.qr-wrap {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0;
-  height: 100%;
-  padding: 0 60px;
-  position: relative;
+  gap: 12px;
 }
-
-/* 顶部品牌区 */
-.brand-bar {
-  text-align: center;
-  margin-bottom: 36px;
-}
-.brand-logo {
-  display: inline-flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 10px;
-}
-.brand-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--primary), #1d4ed8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 24px rgba(37,99,235,.55);
-}
-.brand-name {
-  font-size: 2rem;
-  font-weight: 800;
-  letter-spacing: .04em;
-  color: #fff;
-}
-.brand-tagline {
-  font-size: 1rem;
-  color: var(--accent);
-  letter-spacing: .12em;
-  font-style: italic;
-  font-weight: 500;
-}
-
-/* 团队卡片网格 */
-.team-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  width: 100%;
-  max-width: 1100px;
-  margin-bottom: 32px;
-}
-.member-card {
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.08);
+.qr-img {
+  max-width: 100%;
+  max-height: 72vh;
   border-radius: 14px;
-  padding: 24px 18px 20px;
-  text-align: center;
-  transition: transform .2s, box-shadow .2s, border-color .2s;
-  position: relative;
-  overflow: hidden;
+  border: 2px solid rgba(255,255,255,.1);
+  box-shadow: 0 8px 32px rgba(0,0,0,.4);
+  object-fit: contain;
 }
-.member-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--primary), var(--accent));
-  opacity: 0;
-  transition: opacity .2s;
-}
-.member-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(37,99,235,.22);
-  border-color: rgba(37,99,235,.35);
-}
-.member-card:hover::before { opacity: 1; }
-
-.member-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  margin: 0 auto 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: #fff;
-  position: relative;
-}
-.avatar-ring {
-  position: absolute;
-  inset: -3px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  background: linear-gradient(135deg, var(--primary), var(--accent)) border-box;
-  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: destination-out;
-  mask-composite: exclude;
-}
-.av-blue   { background: linear-gradient(135deg, #2563EB, #1d4ed8); }
-.av-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
-.av-teal   { background: linear-gradient(135deg, #0d9488, #0f766e); }
-.av-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
-
-.member-name {
-  font-size: .95rem;
-  font-weight: 700;
-  color: #f0f4ff;
-  margin-bottom: 4px;
-}
-.member-role {
+.qr-hint {
   font-size: .75rem;
-  color: var(--accent);
-  font-weight: 600;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-}
-.member-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  justify-content: center;
-}
-.mtag {
-  font-size: .68rem;
-  padding: 2px 8px;
-  border-radius: 10px;
-  background: rgba(37,99,235,.18);
-  color: #93c5fd;
-  border: 1px solid rgba(37,99,235,.3);
-}
-
-/* 底部信息栏 */
-.bottom-info {
-  display: flex;
-  gap: 40px;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.info-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: rgba(255,255,255,.6);
-  font-size: .82rem;
-}
-.info-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: .9rem;
-  flex-shrink: 0;
-}
-.info-label { color: rgba(255,255,255,.38); font-size: .72rem; }
-.info-value { color: #e2e8f0; font-weight: 500; }
-
-/* 致谢语 */
-.thanks-quote {
-  text-align: center;
-  font-size: .88rem;
-  color: rgba(255,255,255,.45);
-  margin-top: 22px;
-  font-style: italic;
+  color: rgba(255,255,255,.4);
   letter-spacing: .04em;
-}
-.thanks-quote strong {
-  color: var(--accent);
-  font-style: normal;
-}
-
-/* 装饰粒子 */
-.deco-dots {
-  position: absolute;
-  bottom: 60px;
-  right: 60px;
-  display: grid;
-  grid-template-columns: repeat(5, 8px);
-  gap: 6px;
-  opacity: .18;
-}
-.deco-dots span {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--primary);
-}
-.deco-dots span:nth-child(odd) { background: var(--accent); }
-
-/* 返回首页按钮 */
-.home-btn {
-  position: absolute;
-  top: 24px;
-  right: 28px;
-  padding: 7px 16px;
-  background: rgba(37,99,235,.15);
-  border: 1px solid rgba(37,99,235,.35);
-  border-radius: 8px;
-  color: #93c5fd;
-  font-size: .78rem;
-  text-decoration: none;
-  transition: background .2s, border-color .2s;
-}
-.home-btn:hover {
-  background: rgba(37,99,235,.3);
-  border-color: var(--primary);
 }
 </style>
 </head>
 <body>
-<div class="slide-wrap">
-
-  <!-- 进度条 -->
-  <div class="progress-bar" id="prog"></div>
-
-  <!-- Header -->
+<div class="slide">
   <div class="slide-header">
-    <span class="slide-num">20 / 20</span>
-    <span class="slide-chapter">致谢 & 团队</span>
+    <div class="slide-logo"><span class="dot"></span> VigilAI</div>
+    <div id="slideChapter" class="slide-chapter muted"></div>
+    <div id="slideNum" class="slide-num"></div>
   </div>
-
-  <!-- 返回首页 -->
-  <a class="home-btn" href="index.html">⌂ 返回目录</a>
-
-  <!-- Body -->
   <div class="slide-body">
-    <div class="final-wrap">
-
-      <!-- 品牌区 -->
-      <div class="brand-bar">
+    <div class="final-layout">
+      <!-- 左侧 -->
+      <div class="final-left">
         <div class="brand-logo">
           <div class="brand-icon">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
               <circle cx="14" cy="14" r="11" stroke="#60a5fa" stroke-width="1.5" fill="none" opacity=".5"/>
               <circle cx="14" cy="14" r="7" stroke="#60a5fa" stroke-width="1.5" fill="none" opacity=".7"/>
               <circle cx="14" cy="14" r="3" fill="#60a5fa"/>
-              <line x1="14" y1="3" x2="14" y2="25" stroke="#60a5fa" stroke-width="1" opacity=".3"/>
-              <line x1="3" y1="14" x2="25" y2="14" stroke="#60a5fa" stroke-width="1" opacity=".3"/>
               <circle cx="21" cy="8" r="2" fill="#f59e0b"/>
             </svg>
           </div>
-          <span class="brand-name">Strategic Radar</span>
+          <span class="brand-name">VigilAI</span>
         </div>
         <div class="brand-tagline">"See Earlier · Decide Smarter · Act Faster"</div>
-      </div>
 
-      <!-- 团队卡片 -->
-      <div class="team-grid">
-        <!-- 成员1 -->
-        <div class="member-card">
-          <div class="member-avatar av-blue">
-            <div class="avatar-ring"></div>
-            冯
+        <div class="author-card">
+          <div class="author-name">冯伟雄</div>
+          <div class="author-role">Full-Stack Engineer · Solo Developer</div>
+          <div class="author-tags">
+            <span class="atag">Django 4.2</span>
+            <span class="atag">ASGI 流式</span>
+            <span class="atag">多智能体</span>
+            <span class="atag">PEST/SWOT</span>
+            <span class="atag">真实采集</span>
           </div>
-          <div class="member-name">冯 &nbsp; &nbsp;</div>
-          <div class="member-role">Lead Engineer</div>
-          <div class="member-tags">
-            <span class="mtag">Django</span>
-            <span class="mtag">架构设计</span>
-            <span class="mtag">A2A协议</span>
+          <div style="font-size:.72rem;color:var(--text-2);line-height:1.6;">
+            深圳 AI for Human 企业 Agent 挑战赛<br>
+            赛道 A · 战略模拟器 · 独立开发 26h
           </div>
         </div>
 
-        <!-- 成员2 -->
-        <div class="member-card">
-          <div class="member-avatar av-orange">
-            <div class="avatar-ring"></div>
-            AI
+        <div class="info-grid">
+          <div class="info-cell">
+            <div class="ic-label">技术栈</div>
+            <div class="ic-value">Django · Celery · Channels</div>
           </div>
-          <div class="member-name">AI &nbsp; 模型层</div>
-          <div class="member-role">LLM Integration</div>
-          <div class="member-tags">
-            <span class="mtag">PEST/SWOT</span>
-            <span class="mtag">Mock LLM</span>
-            <span class="mtag">评分引擎</span>
+          <div class="info-cell">
+            <div class="ic-label">数据源</div>
+            <div class="ic-value">134 源 · 18 采集函数</div>
           </div>
-        </div>
-
-        <!-- 成员3 -->
-        <div class="member-card">
-          <div class="member-avatar av-teal">
-            <div class="avatar-ring"></div>
-            数
+          <div class="info-cell">
+            <div class="ic-label">智能体</div>
+            <div class="ic-value">4 节点 A2A 协议</div>
           </div>
-          <div class="member-name">数据 &nbsp; 团队</div>
-          <div class="member-role">Data Engineering</div>
-          <div class="member-tags">
-            <span class="mtag">FRED API</span>
-            <span class="mtag">World Bank</span>
-            <span class="mtag">GDELT</span>
+          <div class="info-cell">
+            <div class="ic-label">推送</div>
+            <div class="ic-value">飞书 · 邮件 · WebSocket</div>
           </div>
         </div>
 
-        <!-- 成员4 -->
-        <div class="member-card">
-          <div class="member-avatar av-purple">
-            <div class="avatar-ring"></div>
-            产
-          </div>
-          <div class="member-name">产品 &nbsp; 设计</div>
-          <div class="member-role">Product & UX</div>
-          <div class="member-tags">
-            <span class="mtag">驾驶舱UI</span>
-            <span class="mtag">战略简报</span>
-            <span class="mtag">告警推送</span>
-          </div>
+        <div class="thanks-line">
+          感谢评委宝贵时间 · 欢迎现场 Demo · <strong>VigilAI</strong>
         </div>
       </div>
 
-      <!-- 项目信息栏 -->
-      <div class="bottom-info">
-        <div class="info-item">
-          <div class="info-icon">🏗</div>
-          <div>
-            <div class="info-label">技术栈</div>
-            <div class="info-value">Django 5 · PostgreSQL · Redis · Celery · Channels</div>
-          </div>
-        </div>
-        <div class="info-item">
-          <div class="info-icon">📡</div>
-          <div>
-            <div class="info-label">数据源</div>
-            <div class="info-value">113 个信息源 · 500+ 种子关键词 · 3 个公开 API</div>
-          </div>
-        </div>
-        <div class="info-item">
-          <div class="info-icon">🤖</div>
-          <div>
-            <div class="info-label">智能体</div>
-            <div class="info-value">4 节点 A2A 协议 · Mock LLM · 仿真降级模式</div>
-          </div>
-        </div>
-        <div class="info-item">
-          <div class="info-icon">⚡</div>
-          <div>
-            <div class="info-label">实时推送</div>
-            <div class="info-value">WebSocket · 邮件 / Webhook · 高影响告警链路</div>
-          </div>
-        </div>
+      <!-- 右侧：微信二维码 -->
+      <div class="qr-wrap">
+        <img class="qr-img" src="feng.jpg" alt="冯伟雄微信二维码">
+        <div class="qr-hint">扫码添加微信 · 交流合作</div>
       </div>
-
-      <!-- 致谢语 -->
-      <div class="thanks-quote">
-        感谢评委与评审团的宝贵时间 &nbsp;·&nbsp;
-        本项目代码已完整实现，欢迎现场 Demo &nbsp;·&nbsp;
-        <strong>Strategic Radar</strong> — 让战略决策快人一步
-      </div>
-
-      <!-- 装饰点阵 -->
-      <div class="deco-dots">
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
-      </div>
-
     </div>
   </div>
-
-  <!-- Footer -->
   <div class="slide-footer">
-    <span>Strategic Radar &copy; 2026 &nbsp;|&nbsp; 海外市场战略情报 Agent</span>
-    <span>See Earlier · Decide Smarter</span>
+    <span>← → 键盘翻页</span>
+    <div class="progress-bar"><div class="progress-bar-fill"></div></div>
+    <span>VigilAI · 2026</span>
   </div>
-
 </div>
 <script src="assets/js/common.js"></script>
-<script>
-  // 最后一页，进度100%
-  document.getElementById('prog').style.width = '100%';
-</script>
 </body>
 </html>

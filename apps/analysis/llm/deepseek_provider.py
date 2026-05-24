@@ -80,8 +80,8 @@ class DeepSeekProvider(BaseLLMProvider):
                           or 'https://api.deepseek.com').rstrip('/'))
         self.model = (cfg.get('model')
                       or getattr(settings, 'LLM_MODEL', '')
-                      or 'deepseek-v4-pro')
-        # v4-pro 是 thinking 模型, TTFB 可能几十秒; v4-flash 非思考更快.
+                      or 'deepseek-v4-flash')
+        # v4-flash 非思考模式, 响应快; v4-pro 是 thinking 模型, TTFB 可达几十秒.
         # 统一调高 timeout 避免 urllib socket timeout 划拉思考过程.
         self.timeout = 180
 

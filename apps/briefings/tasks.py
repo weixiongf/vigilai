@@ -115,6 +115,18 @@ def generate_briefing_for_market(target_market: str = 'global',
                           target_market=target_market,
                           auto_pest_swot=True,
                           market_breakdown=market_breakdown)
+
+    # 推送 WebSocket 通知 + 自动分发(飞书+邮件)
+    _push_notify({
+        'type': 'briefing.published',
+        'period_type': period_type,
+        'briefing_id': b.id,
+        'title': b.title,
+        'market': target_market,
+    })
+    from apps.notifications.tasks import dispatch_briefing
+    dispatch_briefing.delay(b.id)
+
     return {'briefing_id': b.id, 'title': b.title, 'market': target_market}
 
 

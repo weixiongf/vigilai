@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>数据采集策略 · Strategic Radar</title>
+<title>数据采集策略 · VigilAI</title>
 <link rel="stylesheet" href="assets/css/common.css">
 <style>
 .dual-engine{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px;}
@@ -32,7 +32,7 @@
 <body>
 <div class="slide">
   <div class="slide-header">
-    <div class="slide-logo"><span class="dot"></span> Strategic Radar</div>
+    <div class="slide-logo"><span class="dot"></span> VigilAI</div>
     <div id="slideChapter" class="slide-chapter muted"></div>
     <div id="slideNum" class="slide-num"></div>
   </div>
@@ -95,24 +95,24 @@
           <strong>real</strong>：强制真实，适合生产环境</p>
       </div>
       <div class="strat-box">
-        <h4>信息源注册</h4>
-        <p>113 个候选源按优先级 (critical/high/medium/low) 分级，
-          <strong>采集难度 ⭐~⭐⭐⭐⭐⭐</strong> 排序，付费源单独标记。
-          当前阶段已接入 <strong>35 个真实采集器</strong> (含 17 个 RSS 源)，
-          覆盖宏观/产业/平台/法规/社交/学术五大维度；
-          剩余源进入 <strong>路线图</strong>，以 simulated 兑现价值</p>
+        <h4>可信度准入</h4>
+        <p>134 个候选源按 <strong>access_tier</strong>（免费/注册/付费）分层管控，
+          按 <strong>priority</strong>（关键→低）四级排序；
+          管理员可一键关闭某层级，从源头拦截低质数据；
+          <strong>URL 去重 + CrawlJob 溯源</strong>保证数据血统可查</p>
       </div>
       <div class="strat-box">
-        <h4>去重策略</h4>
-        <p>URL 唯一性约束保证不重复入库；连续失败 N 次后自动降级；
-          <strong>CrawlJob 记录</strong>每次采集详情可回溯</p>
+        <h4>权威性识别</h4>
+        <p>LLM 评估每条情报的 <strong>信息源权威性 (0-2)</strong>：
+          命中央行/Fed/SEC/海关等权威关键词自动加分；
+          权威性越高 → 综合影响分越高 → 优先推送决策层</p>
       </div>
     </div>
   </div>
   <div class="slide-footer">
     <span>← → 键盘翻页</span>
     <div class="progress-bar"><div class="progress-bar-fill"></div></div>
-    <span>Strategic Radar · 2026</span>
+    <span>VigilAI · 2026</span>
   </div>
 </div>
 <script src="assets/js/common.js"></script>
