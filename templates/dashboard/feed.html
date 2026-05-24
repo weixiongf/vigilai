@@ -169,7 +169,7 @@
    · 与 feed.js 解耦，调用 window.SR_openIntel / SR_streamBuffer #}
 <style>
 #sseFloatPanel {
-  position: fixed; top: 12px; right: 12px;
+  position: fixed; top: 12px; left: 50%;
   z-index: 99999; width: min(640px, 92vw); max-height: 25vh;
   background: var(--cards-secondary, rgba(22,24,30,.96));
   color: var(--text-1);
@@ -177,10 +177,10 @@
   border-radius: var(--r);
   box-shadow: 0 8px 32px rgba(0,0,0,.45);
   font-size: var(--fz-xxs); line-height: 1.55;
-  display: none; opacity: 0; transform: translateY(-8px);
+  display: none; opacity: 0; transform: translate(-50%, -8px);
   transition: opacity .2s ease, transform .2s ease;
 }
-#sseFloatPanel.show { display: block; opacity: 1; transform: translateY(0); }
+#sseFloatPanel.show { display: block; opacity: 1; transform: translate(-50%, 0); }
 /* Tab Bar */
 #sseFloatPanel .sf-tabbar {
   display: flex; gap: 2px; align-items: center;
@@ -252,7 +252,7 @@
 <script>
 (function () {
   console.log('%c[feed.html inline]', 'color:#5fd97a;font-weight:bold;font-size:13px;',
-              'v=2026-05-24-multitab  · 多Tab浮窗 · reasoning走浮窗 · token走抽屉');
+              'v=2026-05-24-stable  · 多 Tab 浮窗 · reasoning 走浮窗 · token 走抽屉 · SSE 真流式 (async view)');
   if (window.__sseFloatHooked) return;
   window.__sseFloatHooked = true;
   const OriginalES = window.EventSource;
@@ -360,7 +360,9 @@
     bodies.appendChild(body);
 
     const t = {
-      id: key, seq: seq, status: 'running', lastEventAt: Date.now(),
+      id: key, seq: seq, status: 'running',
+      lastEventAt: Date.now(),
+      hasActivity: false,   // 必须收到过 ≥1 个 reasoning/token 才启用 idle 兑底
       tabEl: tabEl, body: body, hideTimer: null,
       typer: makeTypewriter(function (text) {
         appendReasoningText(body, text);
@@ -453,12 +455,13 @@
     if (!tok) return;
     const t = getOrCreateTab(id);
     t.lastEventAt = Date.now();
+    t.hasActivity = true;
     t.typer.push(tok);
   }
   function pushToken(id, tok) {
     // 正文 token 不进浮窗，概念上该条思考完成进入输出阶段
     const t = state.tabs.get(String(id));
-    if (t) t.lastEventAt = Date.now();
+    if (t) { t.lastEventAt = Date.now(); t.hasActivity = true; }
     if (window.SR_openIntel) {
       try { window.SR_openIntel(id); } catch (_) {}
     }
@@ -468,14 +471,18 @@
   window.SR_markTabStatus = markTabStatus;
   window.SR_getOrCreateTab = getOrCreateTab;
 
-  // ============ idle 兑底 (6s 无事件且仍在 running → 强制 done) ============
+  // ============ idle 兑底 — 仅收过活动且 90s 无新事件才强制 done
+  //   v4-pro reasoning 阶段首 token 可能 30~60s 才来，不能按旧浮窗的 6s 去判。
+  //   hasActivity=false 时 — 这条连 ·1 个 token/reasoning 都没收到，可能还在排队或走 LLM
+  //   处于思考，永远不兑底，避免误杀。
   setInterval(function () {
     const now = Date.now();
     state.tabs.forEach(function (t) {
       if (t.status !== 'running') return;
-      if (now - t.lastEventAt > 6000) markTabStatus(t.id, 'done');
+      if (!t.hasActivity) return;        // 未收到任何事件 → 不兑底
+      if (now - t.lastEventAt > 90000) markTabStatus(t.id, 'done');
     });
-  }, 1000);
+  }, 2000);
 
   // ============ WS 事件 (批量分析路径) ============
   document.addEventListener('sr:ws', function (ev) {

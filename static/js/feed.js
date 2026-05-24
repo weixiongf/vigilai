@@ -1,8 +1,8 @@
 /* 情报动态 — 列表 + 详情 + 实时推送 */
 (function () {
   // 版本标记: 浏览器 console 立即可见, 用于确认加载到的是带流式的最新版
-  console.info('%c[feed.js] v=stream-20260524-daphne', 'color:#4ea1ff;font-weight:bold;font-size:14px;',
-               '· 顶部浮窗 sseFloatPanel · Daphne ASGI · 极简 startStream');
+  console.info('%c[feed.js] v=stream-20260524-async-view', 'color:#4ea1ff;font-weight:bold;font-size:14px;',
+               '· 顶部浮窗 sseFloatPanel · Daphne ASGI · async view · 极简 startStream');
   // 全局注入 blink/spin 动画 (仅初始化一次)
   if (!document.getElementById('feedStreamKeyframes')) {
     const _styleEl = document.createElement('style');

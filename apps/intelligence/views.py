@@ -246,21 +246,35 @@ def _push_notify(payload: dict) -> None:
         pass
 
 
-@require_GET
-def intel_analyze_stream(request, pk: int):
+async def intel_analyze_stream(request, pk: int):
     """SSE 流式分析 — 实时透传 LLM 原生 delta token 到前端,
     分析完成后写回 RawInfo + 推送 notifications.broadcast.
 
+    【关键】必须是 async view —— Django 4.x 在 ASGI(Daphne) 下,
+    sync view 返回的 StreamingHttpResponse 会被 ASGI 适配层完整消费
+    后才发响应头与 body, 表现为 SSE 一次性跳出, 看不到流式 token.
+    只有 async view + async 生成器才能逐块 flush.
+
     实现: queue.Queue + threading.Thread 桥接 ——
-    子线程调用 analyze_one(on_token=...), token 进队; 主生成器从队列取 token
+    子线程调用 analyze_one(on_token=...), token 进队;
+    主 async 生成器用 asyncio.to_thread 非阻塞地从队列取 token,
     yield SSE event, 从而让前端动态看到 LLM 逐字的输出.
     """
+    if request.method != 'GET':
+        return JsonResponse({'error': 'method_not_allowed'}, status=405)
+
+    import asyncio
+    from asgiref.sync import sync_to_async
+
     try:
-        info = RawInfo.objects.select_related('source').get(id=pk)
+        info = await sync_to_async(
+            lambda: RawInfo.objects.select_related('source').get(id=pk),
+            thread_sensitive=False,
+        )()
     except RawInfo.DoesNotExist:
         return JsonResponse({'error': 'not_found'}, status=404)
 
-    def event_stream():
+    async def event_stream():
         import queue as _queue
         import threading as _threading
         from django.db import close_old_connections
@@ -286,11 +300,13 @@ def intel_analyze_stream(request, pk: int):
 
         try:
             yield _sse('start', {'id': info.id, 'title': info.title})
-            _push_notify({'type': 'intel.analyzing', 'id': info.id})
+            await sync_to_async(_push_notify, thread_sensitive=False)(
+                {'type': 'intel.analyzing', 'id': info.id})
 
             # 提示使用的 Provider (让前端可识别 mock vs deepseek)
             try:
-                _prov = get_provider()
+                _prov = await sync_to_async(
+                    get_provider, thread_sensitive=False)()
                 prov_name = _prov.name
                 prov_model = getattr(_prov, 'model', '') or ''
             except Exception:
@@ -318,7 +334,8 @@ def intel_analyze_stream(request, pk: int):
             _n_reasoning = 0
             while True:
                 try:
-                    kind, payload = q.get(timeout=1)
+                    kind, payload = await asyncio.to_thread(
+                        q.get, True, 1)
                 except _queue.Empty:
                     yield _sse('heartbeat', {
                         'ts': int(time.time()),
@@ -342,14 +359,15 @@ def intel_analyze_stream(request, pk: int):
                           f'reasoning={_n_reasoning} token={_n_token}', flush=True)
                     _last_log = time.time()
 
-            t.join(timeout=2)
+            await asyncio.to_thread(t.join, 2)
 
             if result_holder['error']:
                 yield _sse('error', {'error': result_holder['error']})
                 return
 
             # 分析完成, 重读 DB
-            info.refresh_from_db()
+            await sync_to_async(
+                info.refresh_from_db, thread_sensitive=False)()
 
             # 后推思维链 (provider 写回的 chain), 供前端展示"推理过程"
             for st in (info.analysis_chain or []):
@@ -360,7 +378,7 @@ def intel_analyze_stream(request, pk: int):
                 })
 
             yield _sse('result', _intel_result_payload(info))
-            _push_notify({
+            await sync_to_async(_push_notify, thread_sensitive=False)({
                 'type': 'intel.analyzed',
                 'id': info.id,
                 'title': info.title[:80],
@@ -379,7 +397,9 @@ def intel_analyze_stream(request, pk: int):
                     )
                     # bind=True 的 task 不能直接同步调用, 用 .delay()
                     # 调度 (Celery worker 未起时 settings里会 fallback eager)
-                    send_high_impact_alert.delay(info.id)
+                    await sync_to_async(
+                        send_high_impact_alert.delay,
+                        thread_sensitive=False)(info.id)
                     yield _sse('notify', {
                         'channel': 'high_impact',
                         'impact_score': info.impact_score,
@@ -390,7 +410,9 @@ def intel_analyze_stream(request, pk: int):
                     from apps.notifications.tasks import (
                         dispatch_realtime_intel,
                     )
-                    dispatch_realtime_intel.delay(info.id)
+                    await sync_to_async(
+                        dispatch_realtime_intel.delay,
+                        thread_sensitive=False)(info.id)
                     yield _sse('notify', {
                         'channel': 'realtime',
                         'impact_score': info.impact_score or 0,
@@ -406,12 +428,12 @@ def intel_analyze_stream(request, pk: int):
         except Exception as exc:
             yield _sse('error', {'error': str(exc)})
 
-    def _wrapped():
+    async def _wrapped():
         # 起手先发 16KB 注释 padding -- 击穿浏览器/ASGI/Daphne 接收侧缓冲,
         # 否则部分 client 会等 buffer 攒到一定量才触发 onmessage/事件 listener,
         # 表现为 'F12 看到流但 UI 一次性跳出'
         yield ':' + (' ' * 16384) + '\n\n'
-        for chunk in event_stream():
+        async for chunk in event_stream():
             yield chunk
 
     response = StreamingHttpResponse(
