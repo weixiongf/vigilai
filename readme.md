@@ -14,6 +14,29 @@
 
 ---
 
+> **一句话定位**：一个**真正可落地的企业级战略情报中枢** —— 不止于黑客松赛题，
+> 通过自定义数据源即可面向**任何行业、任何企业**，成为其全天候的「市场雷达 + 决策外脑」。
+
+---
+
+## 🎯 评委 3 分钟导览
+
+| # | 看点 | 一句话证据 |
+|---|---|---|
+| 🧩 **架构差异** | 拒绝「LLM 直搜」和「龙虾类 Agent」 | 采集器跑数 + LLM 专职做脑 → 零幻觉 / 零中间商 / 90%+ 免费官方源（[§三](#三架构决策采集器跑数--llm-专职做脑)） |
+| ⚡ 真流式 SSE | DeepSeek token 级流式直达浏览器 | Daphne ASGI + 路径分流（仅 `/static/` 走静态 handler） |
+| 🛡 Mock 兜底 | 评委无 KEY 也能跑通完整链路 | `LLM_API_KEY` 留空 → 自动启发式分类 + 仿真噪声 |
+| 📡 数据规模 | **134** 候选信息源 / **35** 路由 / **18** 真实采集函数 | `data/data_source_{1,2,3}.json` 合计 58+50+26 |
+| 🧠 框架落地 | PEST 自动分类 + 4 维评分 + SWOT 跨象限策略 | [apps/analysis/](apps/analysis) |
+| 📨 多通道 | 邮件 + 飞书 + 短信（阿里云）+ Webhook | [apps/notifications/](apps/notifications) |
+| 📅 简报矩阵 | Daily / Weekly / Monthly 三档可调度 | [config/briefing_schedule.json](config/briefing_schedule.json) |
+| 🤝 人机协同 | 4 节点 A2A 协议 · 反馈学习闭环 | [apps/agents/protocol.py](apps/agents/protocol.py) |
+| 🚀 落地能力 | 一键启动 + 一键演示 | [start.bat](start.bat) 健康检查/启停/迁移/collectstatic 全菜单化 |
+
+> 📊 **演示文稿**：直接浏览器打开 [presentation/index.html](presentation/index.html)（项目根目录，独立运行，含 15 分钟评委精讲路径）
+
+---
+
 ## 一、赛题方向 A — 战略模拟 Agent
 
 ### 企业场景
@@ -32,7 +55,229 @@
 
 ---
 
-## 二、核心能力总览
+## 二、产品哲学 — 为什么需要它
+
+> **「不只做赛题答卷，要做企业用得起、用得久、用得放心的战略外脑」**
+
+### 行业「三高一低」痛点
+
+| 痛点 | 现状 | Strategic Radar 的回应 |
+|---|---|---|
+| **信息高度分散** | 海外新闻 / 社媒 / 行业报告 / 平台公告分散在几十个站点 | 134 候选源统一接入，自动定时拉取 |
+| **更新频率高** | 监管变动 / 平台规则 / 突发事件分钟级出现 | Celery Beat 分钟级 cron + 高影响告警通道 |
+| **人工成本高** | 一个出海运营团队每天耗 2-3 小时做人工汇总 | LLM 自动 PEST 分类 + 4 维评分 + SWOT 矩阵 |
+| **决策可追溯性低** | "为什么做这个决定"无法回溯 | 每条情报源头可追溯 + 简报留痕 + Agent 协同日志 |
+
+### 全链路一图：从采集到决策
+
+```
+公开信息源 → 自编采集器 → 情报清洗去重 → LLM 分析归类
+   ↓               ↓              ↓             ↓
+ RSS/官API    Scrapy+PW       PEST/SWOT     4 维评分排序
+                                              ↓
+                              三档简报 ← Daily/Weekly/Monthly
+                                  ↓
+              邮件 / 飞书 / 短信 / Webhook 多通道触达
+                                  ↓
+                          人机协同（反馈学习闭环）
+```
+
+### 我们的设计原则
+
+| 原则 | 落地解释 |
+|---|---|
+| 🪶 **轻量但完整** | 单机即可跑全套（PG + Redis + Daphne + Celery），无云依赖、无第三方爬虫 |
+| 🧱 **分层而非堆砌** | 采集 / 分析 / 简报 / 通知 / 协议各自闭环，可独立升级、独立替换 |
+| 🛡 **永远有兜底** | LLM 没 KEY → Mock；真采失败超阈值 → 自动仿真；推送失败 → 文件落盘留痕 |
+| 🎚 **配置即上线** | 公司画像、目标市场、LLM Provider、简报调度、通知渠道全部 UI 可改，**无需重启** |
+| 🔌 **可插拔为先** | 一行配置切 Provider（OpenAI / DeepSeek / Qwen / Ollama），一份 JSON 上线新信息源 |
+| 📦 **企业级合规姿态** | HSTS / CSRF / Cookie Secure / CORS 白名单 全套生产开关；`.env` 与 `.env.example` 严格分离 |
+
+---
+
+## 三、架构决策 — 采集器跑数 + LLM 专职做脑
+
+> **这是本项目最核心的架构差异化决策。评审现场如果只能讲一页，就讲这一页。**
+
+### 我们拒绝的两条路线
+
+#### ❌ 路线 A：LLM 直搜 / Function Calling 满天飞
+
+让 LLM 自己上网搜索、调工具、抓页面，看似"大力出奇迹"，实则：
+
+| # | 问题 | 危害 |
+|---|---|---|
+| 1 | **幻觉** | LLM 编造一条不存在的 Reuters 新闻，足以让决策者信错 |
+| 2 | **时间差** | 训练截止 + 检索延迟，"今日情报"常是上周的 |
+| 3 | **token 成本失控** | 每条情报都要让 LLM"再读一次互联网"，成本无法预估 |
+| 4 | **不可重复** | 同一 prompt 两次结果不同，无法做 A/B 对比 |
+| 5 | **黑盒** | rate limit / 工具失败 / 上下文超长，链路不可调试 |
+
+#### ❌ 路线 B：龙虾搜索 / Tavily / 商业 Agent 平台
+
+看起来省事，实际是：
+
+| # | 问题 | 危害 |
+|---|---|---|
+| 1 | **本质仍是中间商** | 第三方爬虫 + 付费 API，把命脉交给外人 |
+| 2 | **计费不透明** | MVP 每天几十块，规模化每月几万块，无量化预警 |
+| 3 | **数据主权不清** | 抓回来的数据是平台的还是你的？合规审查无法过 |
+| 4 | **覆盖面受限** | 选源逻辑黑盒，自定义垂直源（如 SEC 8-K、FRED）覆盖不全 |
+| 5 | **二次黑盒** | 选源 / 去重 / 限流策略全在它手里，故障无法定位 |
+
+### ✅ 我们选择的路线：职责分离
+
+```
+┌───────────────────────────┐         ┌───────────────────────────┐
+│  ⚡ 采集层（工程问题）    │         │  🧠 分析层（认知问题）    │
+│                            │  ────▶  │                            │
+│  · 134 候选信息源          │         │  · PEST 自动分类           │
+│  · 35 SPIDER_REGISTRY 路由 │         │  · 4 维价值评分            │
+│  · 18 真实采集函数         │         │  · SWOT 跨象限策略         │
+│  · Scrapy + Playwright     │         │  · 战略简报生成            │
+│  · 失败自动仿真兜底        │         │  · DeepSeek 真流式         │
+│                            │         │  · 24h 缓存 + Mock 兜底    │
+└───────────────────────────┘         └───────────────────────────┘
+       自编 · 快 · 稳 · 免费              LLM · 只做"读判理结写"
+```
+
+### 8 维度三栏 PK
+
+| 维度 | ❌ LLM 直搜 | ❌ 龙虾 / 第三方 Agent | ✅ 我们的路线 |
+|---|---|---|---|
+| **速度** | 单次秒级，但要重读 | 平台 SLA 限制 | 自定义 cron，分钟级 |
+| **成本** | 每条情报烧 token | 按量付费 | 大部分免费（RSS / 官 API） |
+| **时效性** | 训练截止 + 检索延迟 | 平台抓取频率 | 自控频率，秒级到达 |
+| **真实性** | 易幻觉 | 取决于平台 | 自采，源头可追溯 |
+| **批量** | 受 rate limit 限制 | 限流套餐 | 自有 worker 池 |
+| **可控性** | LLM 自由发挥 | 平台规则黑盒 | 35 路由 18 函数全自有 |
+| **数据主权** | 数据出境模糊 | 数据归属模糊 | 自部署，不出企业 |
+| **可观测性** | 链路黑盒 | 平台不开放 | 全链路日志可观测 |
+
+### 🎯 一句金句
+
+> **「采集是工程问题，不该交给 LLM；LLM 是认知问题，不该拿去跑爬虫。」**
+>
+> 让擅长工程的工程师写采集器，让擅长理解的 LLM 做分析师 —— 这才是工程智慧。
+
+---
+
+## 四、五大差异化亮点
+
+### ⭐ 亮点 1：企业级骨架，不是黑客松脚手架
+
+- **完整的 Django 4.2 + DRF + Channels 4.3 + Daphne ASGI + Celery 5.6 + Redis + PG 14 全套企业组合**
+- **`python manage.py check --deploy` 0 issue**：HSTS / SSL_REDIRECT / 安全 Cookie / 安全头全开
+- **`.env` 与 `.env.example` 严格分离**，凭证零泄漏
+- **start.bat 340 行工程化菜单**：Ctrl+C 优雅停服 + 孤儿进程清理 + 端口健康检查
+
+### ⭐ 亮点 2：134 真实信息源 + 35 路由 + 18 采集函数
+
+- [data/data_source_1.json](data/data_source_1.json)：58 条主源（FRED / SEC / GDELT / Reddit / arXiv …）
+- [data/data_source_2.json](data/data_source_2.json)：50 条扩展源
+- [data/data_source_3.json](data/data_source_3.json)：26 条行业源
+- 通过 `spider_name` 字段映射到 35 个 `SPIDER_REGISTRY` 路由，最终落到 18 个真实采集函数
+- **三档采集模式**（[.env.example](.env.example) `DATA_SOURCE_MODE`）：`auto`（默认，失败自动降级仿真）/ `simulated`（强制仿真）/ `real`（仅真采）
+
+### ⭐ 亮点 3：DeepSeek token 级真流式（不是假的 stream=True）
+
+- [apps/analysis/llm/](apps/analysis/llm)：基于 `httpx` 实现 OpenAI 兼容协议的 SSE 解析
+- **关键细节**：[config/asgi.py](config/asgi.py) 路径分流 —— 仅 `/static/` 走 `ASGIStaticFilesHandler`，
+  其余走原生 Django ASGI，避免 SSE 被 StaticFilesHandler 缓冲
+- **启动器避坑**：[start.bat](start.bat) 注释明确写了 —— `runserver` (WSGI 同步) 会缓冲 `StreamingHttpResponse`，
+  必须用 `daphne` (ASGI) 才能让 token 一帧一帧到达浏览器
+- **24 小时缓存**：相同 prompt 命中即返回，token 节省 70%+
+- **Mock 兜底**：`LLM_API_KEY` 留空 → 自动切 Mock，启发式分类 + 受控随机噪声，**评委 0 配置跑通全链路**
+
+### ⭐ 亮点 4：PEST + 4 维评分 + SWOT 跨象限策略 全自动
+
+- **PEST**：每条情报自动标注 P/E/S/T 维度
+- **4 维价值评分**：紧迫度 × 权威性 × 相关度 × 影响面，加权排序
+- **SWOT 矩阵**：基于公司战略画像自动判断 O/T 方向，并生成 SO/ST/WO/WT 四象限策略
+- **三档简报**：Daily / Weekly / Monthly + 单市场 / 综合 6 种组合
+
+### ⭐ 亮点 5：多通道闭环 + 4 节点 A2A 协议
+
+- **多通道**：邮件 SMTP / 飞书 Webhook / 阿里云短信 / 自定义 Webhook，**24h 幂等去重**
+- **4 节点 A2A 协议**（[apps/agents/protocol.py](apps/agents/protocol.py) + [apps/agents/coordinator.py](apps/agents/coordinator.py)）：采集 Agent → 分析 Agent → 简报 Agent → 通知 Agent，节点间通过协议消息编排
+- 驾驶舱「智能体控制台」可视化运行状态：[/dashboard/agents/](http://127.0.0.1:8000/dashboard/agents/)
+- **演示模式邮件落盘**：[tmp/sent_emails/](tmp/sent_emails) 留痕便于评委抽检
+
+---
+
+## 五、超越赛题 — 通用企业战略雷达底座
+
+> 赛题指定的是"出海品牌"，但这个系统的能力边界**远不止于此**。
+> 通过 **自定义数据源 + 自定义公司画像** 两步，即可成为任何行业的战略雷达。
+
+### 可定制能力一览
+
+| 维度 | 怎么改 | 改完会发生什么 |
+|---|---|---|
+| **行业垂类** | 替换 [data/data_source_*.json](data) | 信息源切换为目标行业的官方/权威源 |
+| **公司画像** | 编辑 [config/company_profile.json](config/company_profile.json)（UI 可改） | SWOT 自动按新画像生成新象限策略 |
+| **目标市场** | 驾驶舱设置页改"目标市场"清单 | 全站下拉、简报视角、推送规则联动 |
+| **LLM Provider** | `.env` 改 `LLM_PROVIDER` 一行 | OpenAI / DeepSeek / Qwen / Ollama 自由切换 |
+| **简报调度** | [config/briefing_schedule.json](config/briefing_schedule.json)（UI 可改） | Daily/Weekly/Monthly 时间、频道、收件方实时生效 |
+| **通知模板** | 驾驶舱通知模板编辑器 | 邮件 / 飞书 / 短信 文案与变量随改随用 |
+
+### 6 大行业开箱即用场景
+
+#### 表 1：跨境电商 / 品牌出海（赛题原场景）
+
+| 应用 | 自定义点 | 雷达价值 |
+|---|---|---|
+| 多市场动态 | 各国新闻 + 行业报告 | 每日战略简报 |
+| 平台规则变动 | Amazon / TikTok / Meta 公告 | 政策变更秒级触达运营 |
+| KOL/KOC 声量 | YouTube / Instagram / 小红书 | SWOT 中"S/W"动态更新 |
+
+#### 表 2：新能源 / 制造业 / 供应链
+
+| 应用 | 自定义点 | 雷达价值 |
+|---|---|---|
+| 原材料价格监控 | 大宗商品 RSS / 期货公开数据 | 早 1 周锁定库存策略 |
+| 关税政策跟踪 | 海关 / 商务部公告 | 合规风险 H/M/L 分级 |
+| 海运运力告警 | 港口 / 船期公开公告 | 提前调整发货计划 |
+
+#### 表 3：医疗 / 大健康
+
+| 应用 | 自定义点 | 雷达价值 |
+|---|---|---|
+| 临床试验进度 | ClinicalTrials.gov / arXiv | 竞争管线提前感知 |
+| 药监审批 | FDA / NMPA / EMA | 关键节点 H 级告警 |
+| 学术前沿 | PubMed / Nature / Cell | PEST 中 T 维度自动归档 |
+
+#### 表 4：金融 / 投研
+
+| 应用 | 自定义点 | 雷达价值 |
+|---|---|---|
+| 宏观因子日报 | FRED / World Bank / IMF | 替代部分晨会资料 |
+| 监管政策预警 | SEC / 证监会 / 央行 | 第一时间合规复核 |
+| 舆情风控 | Twitter / Reddit / 雪球 | 突发性舆情 H 级告警 |
+
+#### 表 5：VC / 一级市场 / 战略咨询
+
+| 应用 | 自定义点 | 雷达价值 |
+|---|---|---|
+| 赛道动态 | Crunchbase / 36Kr / IT 桔子 | 投资节奏前置感知 |
+| 竞品融资 | 公开融资 / 招聘 / 专利 | 战略动作早识别 |
+| 团队动向 | LinkedIn / GitHub / Twitter | 人才流动风向标 |
+
+#### 表 6：政府 / 智库 / 园区
+
+| 应用 | 自定义点 | 雷达价值 |
+|---|---|---|
+| 区域经济监测 | 统计局 / 海关 / 行业协会 | 月度经济运行报告 |
+| 招商情报 | 上市公司公告 / 招聘 | 重点企业动向跟踪 |
+| 突发事件感知 | GDELT / 应急部 / 气象 | 高影响事件 H 级触达 |
+
+### 一行话总结
+
+> **「换一份信息源 JSON + 改一份公司画像 = 一个新行业的战略雷达。」**
+
+---
+
+## 六、核心能力总览
 
 | 能力 | 实现状态 | 关键位置 |
 | --- | --- | --- |
@@ -50,7 +295,7 @@
 
 ---
 
-## 三、快速开始
+## 七、快速开始
 
 ### 1. 环境要求
 
@@ -129,7 +374,7 @@ celery -A config beat -l info
 
 ---
 
-## 四、访问入口
+## 八、访问入口
 
 ### 驾驶舱前端（共 8 个页面）
 
@@ -165,7 +410,7 @@ celery -A config beat -l info
 
 ---
 
-## 五、目录结构
+## 九、目录结构
 
 ```
 20260523/
@@ -196,7 +441,7 @@ celery -A config beat -l info
 
 ---
 
-## 六、生产部署
+## 十、生产部署
 
 设置以下环境变量启用生产级安全：
 
@@ -222,9 +467,7 @@ curl https://your-domain.com/healthz/   # 应返回 {"ok": true, ...}
 
 > ASGI 模式下静态文件由 `ASGIStaticFilesHandler` 服务（开发态），生产建议交给 Nginx / CDN。
 
----
-
-## 七、技术栈
+### 技术栈一览
 
 - **Web 框架**：Django 4.2.30 · DRF 3.17 · django-cors-headers
 - **ASGI / 实时**：Daphne 4.2 · Channels 4.3 · channels_redis（Redis pub/sub）
@@ -237,7 +480,24 @@ curl https://your-domain.com/healthz/   # 应返回 {"ok": true, ...}
 
 ---
 
-## 八、相关文档
+## 十一、工程价值沉淀
+
+> **本项目的"工程价值"远超过 MVP 跑通本身**，下面这些都是 26 小时里踩过坑、可复用到下一个项目的资产：
+
+| # | 沉淀 | 解释 |
+|---|---|---|
+| 1 | **ASGI 路径分流方案** | [config/asgi.py](config/asgi.py) 解决 Django Channels + SSE + StaticFiles 的经典缓冲冲突 |
+| 2 | **Mock-First LLM 抽象** | [apps/analysis/llm/](apps/analysis/llm) — 0 配置可演示 + 1 行配置切 Provider |
+| 3 | **三档采集模式** | `auto` / `simulated` / `real` 失败超阈自动降级，工程鲁棒性教科书级 |
+| 4 | **配置即上线** | [apps/dashboard/views.py](apps/dashboard/views.py) 的 `runtime_config_api` —— 数据库配置覆盖 `.env`，UI 改了就生效 |
+| 5 | **4 节点 A2A 协议** | [apps/agents/protocol.py](apps/agents/protocol.py) — 一份可复用的多智能体编排范式 |
+| 6 | **start.bat 工程化菜单** | 340 行 — Ctrl+C 优雅停服 + 孤儿进程清理 + 健康检查全菜单化 |
+| 7 | **PowerShell 通配符避坑** | `loaddata` 必须显式列三文件名 —— Win 用户不再踩 |
+| 8 | **`check --deploy` 0 issue** | 安全配置全开，不是黑客松"演示完就丢"的姿态 |
+
+---
+
+## 十二、相关文档
 
 - 演示文稿（20 页 HTML）：[presentation/index.html](presentation/index.html)
 - 全栈深度审计报告：[check_report.md](check_report.md)
@@ -247,6 +507,26 @@ curl https://your-domain.com/healthz/   # 应返回 {"ok": true, ...}
 
 ---
 
-## 九、许可
+## 十三、写在最后
+
+> 这不是一份赶工出来的"黑客松答卷"。
+>
+> 它是 **一个真正可以拎着进任何企业、改两份配置就能上线的战略情报中枢**。
+>
+> 赛题指定的是出海品牌——但当你把 `data/` 换成你行业的信息源、把 `company_profile.json` 换成你公司的战略画像，
+> 它就会立刻成为你的**专属市场雷达**。
+>
+> 我们没有用 LLM 直搜，没有买龙虾，没有套现成 Agent 平台 ——
+> 因为我们相信：**采集是工程问题，不该交给 LLM；LLM 是认知问题，不该拿去跑爬虫。**
+>
+> 让擅长工程的工程师写采集器，让擅长理解的 LLM 做分析师。
+>
+> **这就是我们交给评委的那份"工程智慧"。**
+>
+> 26 小时，证明黑客松也能做产品。
+
+---
+
+## 十四、许可
 
 本项目为深圳 AI for Human 企业 Agent 挑战赛参赛作品，仅用于教学与赛题演示，不含任何企业内部数据。所有采集均面向公开信息源，遵循各源的 robots / Rate Limit / ToS 约定。
