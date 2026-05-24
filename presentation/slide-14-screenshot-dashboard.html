@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>驾驶舱演示 · Strategic Radar</title>
+<link rel="stylesheet" href="assets/css/common.css">
+<style>
+/* 模拟驾驶舱界面 */
+.demo-frame{flex:1;display:flex;gap:14px;overflow:hidden;}
+.demo-sidebar{width:140px;flex-shrink:0;background:#0D1525;border:1px solid var(--border);
+  border-radius:10px;padding:12px 0;display:flex;flex-direction:column;gap:2px;}
+.ds-item{padding:8px 14px;font-size:12px;display:flex;align-items:center;gap:7px;
+  color:var(--text-2);border-radius:6px;margin:0 4px;cursor:default;}
+.ds-item.active{background:rgba(37,99,235,.15);color:#60A5FA;}
+.ds-item .ds-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
+.demo-main{flex:1;display:flex;flex-direction:column;gap:10px;}
+.kpi-strip{display:flex;gap:10px;}
+.kpi-c{flex:1;background:var(--bg-card);border:1px solid var(--border);border-radius:9px;
+  padding:10px 14px;display:flex;align-items:center;gap:10px;}
+.kpi-c .kv{font-size:24px;font-weight:800;color:var(--accent);}
+.kpi-c .kl{font-size:11px;color:var(--text-2);}
+.kpi-c .kbadge{margin-left:auto;font-size:10px;padding:2px 7px;}
+.demo-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:10px;overflow:hidden;}
+.demo-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:9px;
+  padding:12px 14px;overflow:hidden;display:flex;flex-direction:column;}
+.dp-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--text-2);margin-bottom:8px;}
+.intel-row{display:flex;align-items:flex-start;gap:8px;font-size:12px;padding:5px 0;
+  border-bottom:1px solid var(--border);}
+.intel-row:last-child{border-bottom:none;}
+.ir-score{min-width:28px;font-weight:800;text-align:right;}
+.ir-dim{font-size:10px;padding:1px 5px;border-radius:3px;flex-shrink:0;}
+.ir-title{flex:1;color:var(--text-2);line-height:1.3;}
+/* 地图模拟 */
+.map-mock{flex:1;background:rgba(0,0,0,.3);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.map-dot{position:absolute;width:10px;height:10px;border-radius:50%;}
+.md-r{background:#EF4444;box-shadow:0 0 8px #EF4444;}
+.md-o{background:#F59E0B;box-shadow:0 0 6px #F59E0B;}
+.md-g{background:#10B981;box-shadow:0 0 6px #10B981;}
+.map-label{position:absolute;font-size:10px;color:var(--text-2);}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="slide-header">
+    <div class="slide-logo"><span class="dot"></span> Strategic Radar</div>
+    <div id="slideChapter" class="slide-chapter muted"></div>
+    <div id="slideNum" class="slide-num"></div>
+  </div>
+  <div class="slide-body">
+    <h2 style="margin-bottom:10px;">驾驶舱演示实况 <span class="tag tag-green" style="font-size:12px;vertical-align:middle;">LIVE UI</span></h2>
+    <div class="demo-frame">
+      <!-- 模拟侧栏 -->
+      <div class="demo-sidebar">
+        <div style="padding:8px 14px;font-size:10px;font-weight:700;color:var(--text-2);
+          text-transform:uppercase;letter-spacing:.08em;">战略情报</div>
+        <div class="ds-item active"><span class="ds-dot"></span> 情报蓝图</div>
+        <div class="ds-item"><span class="ds-dot"></span> 今日简报</div>
+        <div class="ds-item"><span class="ds-dot"></span> 市场动态</div>
+        <div class="ds-item"><span class="ds-dot"></span> 采集调度</div>
+        <div class="ds-item"><span class="ds-dot"></span> 信息源配置</div>
+        <div class="ds-item"><span class="ds-dot"></span> 通知记录</div>
+        <div class="ds-item"><span class="ds-dot"></span> 系统配置</div>
+        <div class="ds-item"><span class="ds-dot"></span> 智能体控制台</div>
+        <div style="flex:1;"></div>
+        <div style="padding:8px 14px;font-size:10px;color:var(--text-2);">
+          🟢 实时连接<br>Celery 运行中
+        </div>
+      </div>
+      <!-- 主内容区 -->
+      <div class="demo-main">
+        <div class="kpi-strip">
+          <div class="kpi-c">
+            <div><div class="kv">247</div><div class="kl">今日新增情报</div></div>
+            <span class="kbadge tag tag-green">+12%</span>
+          </div>
+          <div class="kpi-c">
+            <div><div class="kv" style="color:#EF4444;">32</div><div class="kl">高影响告警</div></div>
+            <span class="kbadge tag tag-red">紧急</span>
+          </div>
+          <div class="kpi-c">
+            <div><div class="kv" style="color:#60A5FA;">5</div><div class="kl">活跃目标市场</div></div>
+            <span class="kbadge tag tag-blue">全覆盖</span>
+          </div>
+          <div class="kpi-c">
+            <div><div class="kv" style="color:#10B981;">96%</div><div class="kl">采集成功率</div></div>
+            <span class="kbadge tag tag-green">正常</span>
+          </div>
+        </div>
+        <div class="demo-grid">
+          <div class="demo-panel">
+            <div class="dp-title">🌍 市场热度分布</div>
+            <div class="map-mock" style="flex:1;">
+              <span style="font-size:11px;color:var(--text-2);">全球市场热力图</span>
+              <div class="map-dot md-r" style="top:35%;left:18%;"></div>
+              <div class="map-dot md-o" style="top:30%;left:48%;"></div>
+              <div class="map-dot md-r" style="top:38%;left:75%;"></div>
+              <div class="map-dot md-g" style="top:52%;left:62%;"></div>
+              <div class="map-dot md-g" style="top:55%;left:35%;"></div>
+              <div class="map-label" style="top:27%;left:12%;">🇺🇸 US</div>
+              <div class="map-label" style="top:25%;left:44%;">🇪🇺 EU</div>
+              <div class="map-label" style="top:33%;left:70%;">🇯🇵 JP</div>
+              <div class="map-label" style="top:47%;left:58%;">🇸🇬 SG</div>
+              <div class="map-label" style="top:50%;left:30%;">🇧🇷 BR</div>
+            </div>
+          </div>
+          <div class="demo-panel">
+            <div class="dp-title">🔥 今日高分情报 Top 5</div>
+            <div class="intel-row">
+              <span class="ir-score" style="color:#EF4444;">9.2</span>
+              <span class="ir-dim tag tag-red">P·T</span>
+              <span class="ir-title">美国关税政策升级，科技出口管制扩大范围</span>
+            </div>
+            <div class="intel-row">
+              <span class="ir-score" style="color:#F59E0B;">8.7</span>
+              <span class="ir-dim tag tag-orange">E</span>
+              <span class="ir-title">美联储鹰派声明，汇率对冲成本预计上升 3%</span>
+            </div>
+            <div class="intel-row">
+              <span class="ir-score" style="color:#F59E0B;">8.1</span>
+              <span class="ir-dim tag tag-green">T</span>
+              <span class="ir-title">TikTok 算法红利期：优质内容流量放大 3x</span>
+            </div>
+            <div class="intel-row">
+              <span class="ir-score" style="color:#F59E0B;">7.9</span>
+              <span class="ir-dim tag tag-green">S</span>
+              <span class="ir-title">东南亚消费升级趋势：品质品类月增 18%</span>
+            </div>
+            <div class="intel-row">
+              <span class="ir-score" style="color:#94A3B8;">7.3</span>
+              <span class="ir-dim tag tag-blue">P</span>
+              <span class="ir-title">欧盟 DMA 合规期：先发者保护窗口开启</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>← → 键盘翻页</span>
+    <div class="progress-bar"><div class="progress-bar-fill"></div></div>
+    <span>Strategic Radar · 2026</span>
+  </div>
+</div>
+<script src="assets/js/common.js"></script>
+</body>
+</html>

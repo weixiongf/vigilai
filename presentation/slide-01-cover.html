@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>封面 · Strategic Radar</title>
+<link rel="stylesheet" href="assets/css/common.css">
+<style>
+.cover-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.cover-bg-glow{position:absolute;width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(37,99,235,.18) 0%,transparent 70%);
+  right:-80px;top:50%;transform:translateY(-50%);}
+.cover-left{flex:1;display:flex;flex-direction:column;justify-content:center;
+  padding-left:16px;gap:20px;z-index:1;}
+.brand-tag-row{display:flex;align-items:center;gap:10px;}
+.brand-tag-row .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);}
+.brand-tag-row span{font-size:13px;color:var(--text-2);letter-spacing:.1em;text-transform:uppercase;}
+.cover-title{font-size:52px;font-weight:900;line-height:1.1;letter-spacing:-.01em;}
+.cover-title .blue{color:#60A5FA;}
+.cover-title .orange{color:var(--accent);}
+.cover-subtitle{font-size:17px;color:var(--text-2);line-height:1.6;max-width:480px;}
+.cover-tags{display:flex;flex-wrap:wrap;gap:8px;}
+.cover-markets{display:flex;gap:14px;font-size:22px;align-items:center;}
+.cover-markets span{font-size:13px;color:var(--text-2);}
+.cover-cta{display:inline-block;padding:12px 36px;background:var(--primary);
+  color:#fff;border-radius:24px;font-size:15px;font-weight:700;text-decoration:none;
+  width:fit-content;}
+/* 雷达动效 */
+.radar-wrap{position:absolute;right:80px;top:50%;transform:translateY(-50%);
+  width:300px;height:300px;z-index:1;}
+.rc{position:absolute;border-radius:50%;border:1px solid rgba(37,99,235,.22);}
+.rc1{inset:0;}
+.rc2{inset:40px;}
+.rc3{inset:80px;}
+.rc4{inset:120px;}
+.rsweep{position:absolute;inset:0;border-radius:50%;
+  background:conic-gradient(transparent 270deg,rgba(37,99,235,.5) 360deg);
+  animation:radar-spin 3s linear infinite;}
+.rline1{position:absolute;left:50%;top:0;bottom:50%;width:1px;
+  background:rgba(37,99,235,.3);transform:rotate(45deg);transform-origin:bottom;}
+.rline2{position:absolute;left:50%;top:0;bottom:50%;width:1px;
+  background:rgba(37,99,235,.2);transform:rotate(-30deg);transform-origin:bottom;}
+.rdot{position:absolute;width:8px;height:8px;border-radius:50%;background:var(--accent);}
+.rdot1{top:30%;left:60%;}
+.rdot2{top:55%;left:72%;}
+.rdot3{top:22%;left:38%;}
+@keyframes radar-spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.slide-body{flex-direction:row;position:relative;overflow:hidden;padding:32px 56px;}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="slide-header">
+    <div class="slide-logo"><span class="dot"></span> Strategic Radar</div>
+    <div id="slideChapter" class="slide-chapter muted"></div>
+    <div id="slideNum" class="slide-num"></div>
+  </div>
+  <div class="slide-body">
+    <div class="cover-bg"><div class="cover-bg-glow"></div></div>
+    <div class="cover-left">
+      <div class="brand-tag-row">
+        <div class="dot"></div>
+        <span>企业 Agent 挑战赛 · 赛道 A · 战略情报预警</span>
+      </div>
+      <h1 class="cover-title">
+        海外市场<br><span class="blue">战略情报</span> <span class="orange">Agent</span>
+      </h1>
+      <p class="cover-subtitle">
+        从信息洪流到战略决策 —<br>
+        面向中国出海企业的 <strong style="color:var(--text-1)">智能情报驾驶舱</strong>
+      </p>
+      <div class="cover-tags">
+        <span class="tag tag-blue">多智能体 A2A</span>
+        <span class="tag tag-orange">PEST / SWOT</span>
+        <span class="tag tag-green">实时 WebSocket</span>
+        <span class="tag tag-gray">双引擎采集</span>
+      </div>
+      <div class="cover-markets">
+        <span>覆盖市场：</span>
+        🇺🇸 🇪🇺 🇯🇵 🇸🇬 🇧🇷
+      </div>
+      <a href="slide-02-pain-points.html" class="cover-cta">开始演示 →</a>
+    </div>
+    <!-- 雷达动效 -->
+    <div class="radar-wrap">
+      <div class="rc rc1"></div>
+      <div class="rc rc2"></div>
+      <div class="rc rc3"></div>
+      <div class="rc rc4"></div>
+      <div class="rsweep"></div>
+      <div class="rline1"></div>
+      <div class="rline2"></div>
+      <div class="rdot rdot1"></div>
+      <div class="rdot rdot2"></div>
+      <div class="rdot rdot3"></div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>← → 键盘翻页</span>
+    <div class="progress-bar"><div class="progress-bar-fill"></div></div>
+    <span>Strategic Radar · 2026</span>
+  </div>
+</div>
+<script src="assets/js/common.js"></script>
+</body>
+</html>

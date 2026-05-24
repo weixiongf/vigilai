@@ -1,0 +1,236 @@
+{% comment %}
+统一简报渲染模板 — 三处共用 (邮件 / 详情页 / 通知预览).
+所有样式 inline 化, 同时兼容 Web 浏览器与邮件客户端.
+
+上下文契约 (见 apps/briefings/services/templates.py::build_briefing_context):
+  - title, market, period_label, period_type_label
+  - period_range, refs
+  - executive_summary, summary_parts
+  - key_findings (list)
+  - top_opportunities, top_risks (list of {title, score, ...})
+  - recommended_actions (list of {type, title, ...})
+  - sections (list of {title, content, icon, color})
+  - has_metrics (bool), kpi_cards, delta, priority
+  - render_mode: 'email' | 'web' | 'preview'
+  - standalone: True 输出完整 <html>...; False 仅输出片段
+{% endcomment %}{% spaceless %}
+{% if standalone %}<!doctype html>
+<html><body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,'Segoe UI',sans-serif;color:#111827;">{% endif %}
+<div class="briefing-render" data-render-mode="{{ render_mode }}" style="max-width:760px;margin:{% if standalone %}24px auto{% else %}0 auto{% endif %};background:#fff;border-radius:8px;overflow:hidden;">
+
+  {# ============ 头部 ============ #}
+  <div style="background:#1d4ed8;color:#fff;padding:18px 22px;">
+    <div style="font-size:13px;opacity:.85;margin-bottom:4px;">📈 {{ market }} · {{ period_label }}</div>
+    <div style="font-size:18px;font-weight:700;line-height:1.4;">{{ title }}</div>
+    <div style="font-size:12px;opacity:.85;margin-top:4px;">
+      <span style="display:inline-block;background:rgba(255,255,255,.18);color:#fff;padding:2px 8px;border-radius:3px;margin-right:6px;font-size:11px;">{{ period_type_label }}</span>
+      <span style="display:inline-block;background:rgba(255,255,255,.18);color:#fff;padding:2px 8px;border-radius:3px;margin-right:6px;font-size:11px;">{{ market }}</span>
+      周期 {{ period_range }} · 引用情报 {{ refs }} 条
+    </div>
+  </div>
+
+  <div style="padding:20px 22px;">
+
+    {# ============ 决策仪表板 (有 metrics 时) ============ #}
+    {% if has_metrics %}
+    <div style="font-size:14px;font-weight:700;color:#111827;margin:0 0 10px;border-left:3px solid #1d4ed8;padding-left:8px;">
+      📊 决策仪表板 · 7 日趋势
+    </div>
+    <table style="width:100%;border-collapse:separate;border-spacing:6px;margin:0 -6px 16px;" cellpadding="0" cellspacing="6">
+      <tr>
+        {% for card in kpi_cards %}
+        <td style="width:25%;background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:10px;vertical-align:top;">
+          <div style="font-size:11px;color:#6b7280;margin-bottom:4px;">{{ card.label }}</div>
+          <div style="font-size:20px;font-weight:700;color:{{ card.value_color }};line-height:1.2;">
+            {{ card.value }}{% if card.unit %} <span style="font-size:11px;color:#9ca3af;font-weight:400;">{{ card.unit }}</span>{% endif %}
+          </div>
+          <div style="font-size:11px;color:#6b7280;margin-top:4px;line-height:1.5;">
+            {{ card.delta_html|safe }} <span style="color:#9ca3af;">vs {{ card.prev_label }}</span>
+          </div>
+          <div style="font-size:11px;color:#9ca3af;margin-top:2px;line-height:1.5;">{{ card.baseline_html|safe }}</div>
+          {% if card.sparkline %}<div style="margin-top:6px;">{{ card.sparkline|safe }}</div>{% endif %}
+        </td>
+        {% endfor %}
+      </tr>
+    </table>
+    {% endif %}
+
+    {# ============ 变化雷达 ============ #}
+    {% if delta %}
+    <div style="font-size:14px;font-weight:700;color:#111827;margin:18px 0 10px;border-left:3px solid #ea580c;padding-left:8px;">
+      📡 变化雷达
+    </div>
+    <table style="width:100%;border-collapse:separate;border-spacing:6px;margin:0 -6px 8px;" cellpadding="0" cellspacing="6">
+      <tr>
+        <td style="width:33.33%;background:#fff7ed;border-left:3px solid #ea580c;padding:10px;vertical-align:top;border-radius:4px;">
+          <div style="font-size:12px;font-weight:700;color:#9a3412;margin-bottom:6px;">
+            🆕 今日新增高影响 ({{ delta.new_high_impact|length }})
+          </div>
+          {% if delta.new_high_impact %}
+          <ul style="font-size:11px;color:#374151;margin:0;padding-left:16px;line-height:1.7;">
+            {% for it in delta.new_high_impact %}
+            <li><b>{{ it.title }}</b> <span style="color:#dc2626;font-weight:700;">{{ it.score }}/10</span></li>
+            {% endfor %}
+          </ul>
+          {% else %}<div style="color:#9ca3af;font-size:11px;">今日无新增高影响</div>{% endif %}
+        </td>
+        <td style="width:33.33%;background:#eff6ff;border-left:3px solid #1d4ed8;padding:10px;vertical-align:top;border-radius:4px;">
+          <div style="font-size:12px;font-weight:700;color:#1e40af;margin-bottom:6px;">
+            🔥 持续话题 ({{ delta.rising_topics|length }})
+          </div>
+          {% if delta.rising_topics %}
+          <ul style="font-size:11px;color:#374151;margin:0;padding-left:16px;line-height:1.7;">
+            {% for it in delta.rising_topics %}
+            <li><b>#{{ it.tag }}</b> <span style="color:#6b7280;">连续</span> <span style="color:#dc2626;font-weight:700;">{{ it.days }} 天</span></li>
+            {% endfor %}
+          </ul>
+          {% else %}<div style="color:#9ca3af;font-size:11px;">无持续话题</div>{% endif %}
+        </td>
+        <td style="width:33.33%;background:#f0fdf4;border-left:3px solid #16a34a;padding:10px;vertical-align:top;border-radius:4px;">
+          <div style="font-size:12px;font-weight:700;color:#166534;margin-bottom:6px;">
+            ✅ 已消退话题 ({{ delta.faded_topics|length }})
+          </div>
+          {% if delta.faded_topics %}
+          <ul style="font-size:11px;color:#374151;margin:0;padding-left:16px;line-height:1.7;">
+            {% for it in delta.faded_topics %}
+            <li><span style="color:#6b7280;">#{{ it.tag }} · 上周</span> <span style="color:#dc2626;font-weight:700;">{{ it.prev_count }} 次</span></li>
+            {% endfor %}
+          </ul>
+          {% else %}<div style="color:#9ca3af;font-size:11px;">无明显消退话题</div>{% endif %}
+        </td>
+      </tr>
+    </table>
+    {% endif %}
+
+    {# ============ 重要性分层 ============ #}
+    {% if priority %}
+    <div style="font-size:14px;font-weight:700;color:#111827;margin:18px 0 10px;border-left:3px solid #dc2626;padding-left:8px;">
+      🎯 重要性分层
+    </div>
+    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:10px 12px;margin-bottom:8px;">
+      <div style="font-size:12px;font-weight:700;color:#991b1b;margin-bottom:4px;">🔴 紧急行动 (≤24h) · {{ priority.urgent|length }} 项</div>
+      {% if priority.urgent %}
+      <ul style="font-size:12px;color:#374151;margin:0;padding-left:18px;line-height:1.8;">
+        {% for it in priority.urgent %}
+        <li>{% if it.is_new %}<span style="color:#ea580c;font-weight:700;">🆕</span> {% endif %}<b>{{ it.title }}</b> <span style="color:#9ca3af;font-size:11px;">[{{ it.market|default:"-" }}]</span> <span style="color:#dc2626;font-weight:700;">{{ it.score }}/10</span></li>
+        {% endfor %}
+      </ul>
+      {% else %}<div style="color:#9ca3af;font-size:11px;">无紧急事项</div>{% endif %}
+    </div>
+    <div style="background:#fefce8;border:1px solid #fde68a;border-radius:6px;padding:10px 12px;margin-bottom:8px;">
+      <div style="font-size:12px;font-weight:700;color:#854d0e;margin-bottom:4px;">🟡 本周关注 (≤7d) · {{ priority.weekly|length }} 项</div>
+      {% if priority.weekly %}
+      <ul style="font-size:12px;color:#374151;margin:0;padding-left:18px;line-height:1.8;">
+        {% for it in priority.weekly %}
+        <li><b>{{ it.title }}</b> <span style="color:#9ca3af;font-size:11px;">[{{ it.market|default:"-" }}]</span> <span style="color:#dc2626;font-weight:700;">{{ it.score }}/10</span></li>
+        {% endfor %}
+      </ul>
+      {% else %}<div style="color:#9ca3af;font-size:11px;">无本周重点</div>{% endif %}
+    </div>
+    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:10px 12px;margin-bottom:8px;">
+      <div style="font-size:12px;font-weight:700;color:#1e40af;margin-bottom:4px;">🔵 长期跟踪 · {{ priority.longterm|length }} 项</div>
+      {% if priority.longterm %}
+      <ul style="font-size:12px;color:#374151;margin:0;padding-left:18px;line-height:1.8;">
+        {% for it in priority.longterm %}
+        <li><b>{{ it.title }}</b> <span style="color:#9ca3af;font-size:11px;">[{{ it.market|default:"-" }}]</span> <span style="color:#dc2626;font-weight:700;">{{ it.score }}/10</span></li>
+        {% endfor %}
+      </ul>
+      {% else %}<div style="color:#9ca3af;font-size:11px;">无</div>{% endif %}
+    </div>
+    {% endif %}
+
+    {# ============ 行政摘要 ============ #}
+    <div style="font-size:14px;font-weight:700;color:#111827;margin:18px 0 8px;border-left:3px solid #3b82f6;padding-left:8px;">
+      🔖 行政摘要
+    </div>
+    {% if summary_parts %}
+    <ul style="font-size:13px;color:#374151;line-height:1.8;margin:0 0 16px;padding-left:20px;">
+      {% for p in summary_parts %}<li>{{ p }}</li>{% endfor %}
+    </ul>
+    {% else %}
+    <p style="font-size:13px;color:#374151;line-height:1.8;margin:0 0 16px;">{{ executive_summary }}</p>
+    {% endif %}
+
+    {# ============ 关键发现 ============ #}
+    {% if key_findings %}
+    <div style="font-size:14px;font-weight:700;color:#111827;margin:18px 0 8px;border-left:3px solid #f59e0b;padding-left:8px;">
+      🔑 关键发现
+    </div>
+    <ul style="font-size:13px;color:#374151;line-height:1.8;margin:0 0 16px;padding-left:20px;">
+      {% for f in key_findings %}
+      <li>{% if f.title %}{{ f.title }}{% else %}{{ f }}{% endif %}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    {# ============ Top 机会 / Top 风险 (双列) ============ #}
+    <table style="width:100%;border-collapse:collapse;margin:18px 0 0;" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="width:50%;vertical-align:top;padding-right:10px;">
+          <div style="font-size:14px;font-weight:700;color:#10b981;margin:0 0 8px;border-left:3px solid #10b981;padding-left:8px;">
+            🟢 Top 机会
+          </div>
+          {% if top_opportunities %}
+          <ul style="font-size:13px;color:#374151;padding-left:20px;margin:0;line-height:1.8;">
+            {% for o in top_opportunities %}
+            <li><b>{{ o.title|default:""|slice:":80" }}</b>
+              <span style="color:#10b981;font-weight:700;">({{ o.score|default:0|floatformat:1 }}/10)</span></li>
+            {% endfor %}
+          </ul>
+          {% else %}<div style="color:#9ca3af;font-size:12px;">暂无</div>{% endif %}
+        </td>
+        <td style="width:50%;vertical-align:top;padding-left:10px;">
+          <div style="font-size:14px;font-weight:700;color:#ef4444;margin:0 0 8px;border-left:3px solid #ef4444;padding-left:8px;">
+            🔴 Top 风险
+          </div>
+          {% if top_risks %}
+          <ul style="font-size:13px;color:#374151;padding-left:20px;margin:0;line-height:1.8;">
+            {% for r in top_risks %}
+            <li><b>{{ r.title|default:""|slice:":80" }}</b>
+              <span style="color:#ef4444;font-weight:700;">({{ r.score|default:0|floatformat:1 }}/10)</span></li>
+            {% endfor %}
+          </ul>
+          {% else %}<div style="color:#9ca3af;font-size:12px;">暂无</div>{% endif %}
+        </td>
+      </tr>
+    </table>
+
+    {# ============ 推荐行动 ============ #}
+    <div style="font-size:14px;font-weight:700;color:#111827;margin:18px 0 8px;border-left:3px solid #1d4ed8;padding-left:8px;">
+      🎯 推荐行动
+    </div>
+    {% if recommended_actions %}
+    <ul style="font-size:13px;color:#374151;padding-left:20px;margin:0;line-height:1.9;">
+      {% for a in recommended_actions %}
+      <li>
+        <span style="display:inline-block;padding:2px 6px;background:#eff6ff;color:#1d4ed8;border-radius:3px;font-size:11px;margin-right:6px;font-weight:600;">{{ a.type|default:"" }}</span>
+        {{ a.title|default:""|slice:":120" }}
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}<div style="color:#9ca3af;font-size:12px;">暂无</div>{% endif %}
+
+    {# ============ 子章节 ============ #}
+    {% if sections %}
+    <div style="font-size:14px;font-weight:700;color:#111827;margin:22px 0 10px;border-left:3px solid #64748b;padding-left:8px;">
+      📑 子章节
+    </div>
+    {% for s in sections %}
+    <div style="background:#f9fafb;border-left:3px solid {{ s.color }};border-radius:4px;padding:10px 12px;margin-bottom:8px;">
+      <div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:6px;">
+        <span style="display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;background:#fff;border:1px solid #e5e7eb;border-radius:4px;margin-right:6px;">{{ s.icon }}</span>
+        {{ s.title }}
+      </div>
+      <div style="font-size:12px;color:#374151;line-height:1.8;white-space:pre-wrap;">{{ s.content }}</div>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0 12px;">
+    <p style="font-size:11px;color:#9ca3af;margin:0;text-align:center;">
+      本{% if standalone %}邮件{% else %}页面{% endif %}由 海外市场战略情报 Agent 自动生成 · 数据基于 PEST + SWOT 分析
+    </p>
+  </div>
+</div>
+{% if standalone %}</body></html>{% endif %}
+{% endspaceless %}

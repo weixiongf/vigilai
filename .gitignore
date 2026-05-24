@@ -1,0 +1,115 @@
+# ============================================================
+# Strategic Radar — .gitignore
+# 防止凭证 / 临时文件 / 构建产物 / 本地配置进入版本控制
+# ============================================================
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+.eggs/
+build/
+dist/
+develop-eggs/
+downloads/
+parts/
+sdist/
+wheels/
+*.manifest
+*.spec
+.venv/
+venv/
+env/
+ENV/
+
+# ---- Django ----
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# ---- Celery beat ----
+celerybeat-schedule
+celerybeat-schedule.*
+celerybeat.pid
+
+# ---- 环境变量 / 凭证 ----
+.env
+.env.*
+!.env.example
+.envrc
+secrets.json
+credentials.json
+*.pem
+*.key
+*.crt
+
+# ---- 临时与运行产物 ----
+tmp/
+temp/
+nul
+
+# ---- Editor / IDE ----
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.history/
+.qoder/
+.project
+.pydevproject
+.settings/
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# ---- 大型二进制 / 录像 / 演示稿 ----
+录像/
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.pptx
+*.ppt
+*.key
+*.numbers
+
+# 仅保留 docs/*.pdf 作为参考资料；其它 .pdf 不入仓
+*.pdf
+!docs/*.pdf
+
+# ---- 测试 / 覆盖率 ----
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# ---- jupyter / notebook ----
+.ipynb_checkpoints/
+
+# ---- node (presentation 若引入构建) ----
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ---- 第三方参考库 (与本项目无依赖关系，不入仓) ----
+ref_libs/
+
+# ---- 内部审计报告 (含调试细节，不入仓) ----
+check_report.md

@@ -1,0 +1,319 @@
+/* ======================================================
+   Strategic Radar Presentation — 公共样式
+   深色商务风格 1280×800 单页演示
+   ====================================================== */
+:root {
+  --bg-deep:  #0B1120;
+  --bg-card:  #131A2D;
+  --bg-card2: #1C2640;
+  --primary:  #2563EB;
+  --accent:   #F59E0B;
+  --success:  #10B981;
+  --danger:   #EF4444;
+  --warn:     #F59E0B;
+  --text-1:   #E5E7EB;
+  --text-2:   #94A3B8;
+  --border:   rgba(255,255,255,0.08);
+  --slide-w:  1280px;
+  --slide-h:  800px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  background: #050B18;
+  font-family: 'Inter', 'PingFang SC', 'Noto Sans SC', system-ui, sans-serif;
+  color: var(--text-1);
+  overflow: hidden;
+}
+
+/* ---- 幻灯片容器 ---- */
+.slide {
+  width: var(--slide-w);
+  height: var(--slide-h);
+  background: var(--bg-deep);
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- 顶部页码栏 ---- */
+.slide-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 32px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card);
+  flex-shrink: 0;
+}
+.slide-logo {
+  display: flex; align-items: center; gap: 8px;
+  font-weight: 700; font-size: 14px; color: var(--primary);
+  letter-spacing: 0.04em;
+}
+.slide-logo .dot { width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); display: inline-block; }
+.slide-chapter { font-size: 12px; color: var(--text-2); }
+.slide-num { font-size: 13px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.slide-num b { color: var(--text-1); }
+
+/* ---- 主内容区 ---- */
+.slide-body {
+  flex: 1;
+  overflow: hidden;
+  padding: 32px 48px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- 底部状态条 ---- */
+.slide-footer {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-card);
+  font-size: 11px;
+  color: var(--text-2);
+  flex-shrink: 0;
+}
+.slide-footer .progress-bar {
+  width: 200px; height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.slide-footer .progress-bar-fill {
+  height: 100%;
+  background: var(--primary);
+  transition: width .3s;
+}
+
+/* ---- 翻页提示 ---- */
+.nav-hint {
+  position: fixed;
+  bottom: 16px; right: 16px;
+  background: rgba(0,0,0,.6);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 12px;
+  color: var(--text-2);
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* ---- 排版工具 ---- */
+h1 { font-size: 42px; font-weight: 800; line-height: 1.2; }
+h2 { font-size: 28px; font-weight: 700; line-height: 1.3; }
+h3 { font-size: 20px; font-weight: 600; }
+h4 { font-size: 16px; font-weight: 600; color: var(--text-2); }
+p  { font-size: 15px; line-height: 1.7; color: var(--text-2); }
+
+.title-primary { color: var(--text-1); }
+.title-accent   { color: var(--accent); }
+.title-blue     { color: var(--primary); }
+.muted          { color: var(--text-2); }
+.tc             { text-align: center; }
+.tr             { text-align: right; }
+
+/* ---- 卡片 ---- */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+.card-accent { border-top: 3px solid var(--accent); }
+.card-blue   { border-top: 3px solid var(--primary); }
+.card-green  { border-top: 3px solid var(--success); }
+.card-red    { border-top: 3px solid var(--danger); }
+
+/* ---- 栅格 ---- */
+.grid { display: grid; gap: 20px; }
+.grid-2 { grid-template-columns: 1fr 1fr; }
+.grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+.grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.grid-5 { grid-template-columns: repeat(5, 1fr); }
+
+/* ---- KPI 数字 ---- */
+.kpi-val { font-size: 36px; font-weight: 800; color: var(--accent); line-height: 1; }
+.kpi-label { font-size: 13px; color: var(--text-2); margin-top: 4px; }
+
+/* ---- 标签 ---- */
+.tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.tag-blue   { background: rgba(37,99,235,.2);  color: #60A5FA; }
+.tag-orange { background: rgba(245,158,11,.2); color: #FCD34D; }
+.tag-green  { background: rgba(16,185,129,.2); color: #34D399; }
+.tag-red    { background: rgba(239,68,68,.2);  color: #F87171; }
+.tag-gray   { background: rgba(148,163,184,.15); color: var(--text-2); }
+
+/* ---- 列表 ---- */
+.feature-list { list-style: none; }
+.feature-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.feature-list li:last-child { border-bottom: none; }
+.feature-list li .ico { color: var(--accent); flex-shrink: 0; }
+
+/* ---- 分隔线 ---- */
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 16px 0;
+}
+
+/* ---- 流程管道 ---- */
+.pipeline {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.pipeline-step {
+  flex: 1;
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 14px;
+  text-align: center;
+  position: relative;
+}
+.pipeline-arrow {
+  width: 32px;
+  flex-shrink: 0;
+  text-align: center;
+  color: var(--primary);
+  font-size: 20px;
+}
+
+/* ---- SWOT 矩阵 ---- */
+.swot-matrix {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.swot-cell {
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+/* ---- 时序图 ---- */
+.timeline-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.timeline-row:last-child { border-bottom: none; }
+.timeline-step-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ---- 封面特效 ---- */
+@keyframes radar-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes pulse-ring {
+  0%   { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+.radar-graphic {
+  position: absolute;
+  right: 60px; top: 50%;
+  transform: translateY(-50%);
+  width: 320px; height: 320px;
+}
+.radar-circle {
+  position: absolute; border-radius: 50%;
+  border: 1px solid rgba(37,99,235,0.25);
+}
+.radar-sweep {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(transparent 270deg, rgba(37,99,235,0.4) 360deg);
+  animation: radar-spin 3s linear infinite;
+}
+
+/* ---- ER 图表格 ---- */
+.er-table {
+  width: 100%; border-collapse: collapse; font-size: 13px;
+}
+.er-table th, .er-table td {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+.er-table th { background: var(--bg-card2); color: var(--text-2); font-weight: 600; }
+.er-table tr:hover td { background: rgba(37,99,235,.06); }
+
+/* ---- 代码块 ---- */
+pre.code-block {
+  background: rgba(0,0,0,.4);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  color: #93C5FD;
+  overflow: auto;
+  line-height: 1.6;
+}
+
+/* ---- 架构图盒子 ---- */
+.arch-layer {
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 20px;
+  margin-bottom: 12px;
+}
+.arch-layer-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text-2);
+  margin-bottom: 8px;
+}
+.arch-items {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+.arch-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+/* ---- 雷达五边形 (SVG) ---- */
+.radar-chart-wrap { display: flex; justify-content: center; align-items: center; }

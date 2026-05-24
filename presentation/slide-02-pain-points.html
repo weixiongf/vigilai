@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>行业洞察 · Strategic Radar</title>
+<link rel="stylesheet" href="assets/css/common.css">
+<style>
+.pain-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:8px;}
+.pain-card{background:var(--bg-card);border:1px solid rgba(239,68,68,.25);border-radius:14px;
+  padding:28px 24px;border-top:3px solid var(--danger);}
+.pain-icon{font-size:36px;margin-bottom:12px;}
+.pain-num{font-size:11px;font-weight:700;color:var(--danger);letter-spacing:.1em;
+  text-transform:uppercase;margin-bottom:8px;}
+.pain-title{font-size:18px;font-weight:700;margin-bottom:10px;}
+.pain-desc{font-size:14px;color:var(--text-2);line-height:1.6;}
+.pain-stat{display:inline-block;margin-top:12px;padding:4px 12px;
+  background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);
+  border-radius:20px;font-size:13px;color:#F87171;font-weight:600;}
+.bottom-row{display:flex;gap:16px;margin-top:20px;}
+.bottom-box{flex:1;background:var(--bg-card);border:1px solid var(--border);
+  border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:14px;}
+.bottom-box .ico{font-size:24px;}
+.bottom-box .txt{font-size:14px;color:var(--text-2);}
+.bottom-box .txt strong{color:var(--text-1);}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="slide-header">
+    <div class="slide-logo"><span class="dot"></span> Strategic Radar</div>
+    <div id="slideChapter" class="slide-chapter muted"></div>
+    <div id="slideNum" class="slide-num"></div>
+  </div>
+  <div class="slide-body">
+    <h2 style="margin-bottom:6px;">行业洞察 <span style="color:var(--text-2);font-weight:400">·</span> 出海企业的 3 大情报困局</h2>
+    <p class="muted" style="margin-bottom:20px;">每天有大量信号涌入，但真正有价值的战略情报却总是来得太晚、太杂、太难用</p>
+
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="pain-icon">📡</div>
+        <div class="pain-num">困局 01</div>
+        <div class="pain-title">信息源极度分散</div>
+        <div class="pain-desc">央行公告、统计局数据、新闻资讯、社媒舆情、平台规则、法规政策……<br>
+          60+ 个来源，没有统一入口，团队每天靠人工拼凑。</div>
+        <span class="pain-stat">60+ 信息源待整合</span>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">🔊</div>
+        <div class="pain-num">困局 02</div>
+        <div class="pain-title">情报噪声 95%</div>
+        <div class="pain-desc">海量内容中，真正影响战略决策的不到 5%。<br>
+          分析师每天花大量时间过滤无关内容，高价值情报反而淹没其中。</div>
+        <span class="pain-stat">真正有效信号 &lt; 5%</span>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">⏰</div>
+        <div class="pain-num">困局 03</div>
+        <div class="pain-title">响应慢、滞后严重</div>
+        <div class="pain-desc">关键政策发布、竞品新动作、平台规则更新……<br>
+          团队往往在发生 1-2 周后才识别，错失最佳应对窗口期。</div>
+        <span class="pain-stat">平均滞后 7-14 天</span>
+      </div>
+    </div>
+
+    <div class="bottom-row">
+      <div class="bottom-box">
+        <div class="ico">📉</div>
+        <div class="txt"><strong>决策质量下降</strong><br>基于过时、不完整信息做出的战略调整，往往错失先机</div>
+      </div>
+      <div class="bottom-box">
+        <div class="ico">💰</div>
+        <div class="txt"><strong>成本持续高企</strong><br>大量人力投入重复性信息收集整理，而非真正的战略分析</div>
+      </div>
+      <div class="bottom-box">
+        <div class="ico">🎯</div>
+        <div class="txt"><strong>战略盲区扩大</strong><br>没有系统化框架，PEST/SWOT 洞察靠经验而非数据驱动</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>← → 键盘翻页</span>
+    <div class="progress-bar"><div class="progress-bar-fill"></div></div>
+    <span>Strategic Radar · 2026</span>
+  </div>
+</div>
+<script src="assets/js/common.js"></script>
+</body>
+</html>

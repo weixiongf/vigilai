@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_intro %}
+<div class="page-intro">
+  <div class="breadcrumbs">
+    <span>战略情报</span><span class="sep">/</span>
+    <span>通知记录</span>
+  </div>
+  <h1><i class="ri-notification-3-line"></i> 通知记录</h1>
+  <div class="desc">
+    管理收件人、订阅项与发送日志 · 飞书 / 邮件 / WebSocket 多通道分发 ·
+    点击日志行查看完整 payload
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{# ===================== 双栏: 收件人 + 编辑表单 ===================== #}
+<div class="grid grid-2" style="grid-template-columns:3fr 2fr; gap:12px;">
+
+  {# ---------- 左：收件人列表 ---------- #}
+  <div class="panel">
+    <div class="panel-h">
+      <h3><i class="ri-team-line"></i> 通知收件人</h3>
+      <button class="btn btn-primary btn-sm" id="btnNewRecipient">
+        <i class="ri-add-line"></i> 新建
+      </button>
+    </div>
+    <div class="panel-body">
+      <div class="list-head" style="grid-template-columns: 28px 1.4fr 1.6fr 0.6fr 1.6fr 0.6fr 0.8fr;">
+        <div></div>
+        <div>姓名 / 角色</div>
+        <div>邮件</div>
+        <div>飞书</div>
+        <div>订阅项</div>
+        <div>推送</div>
+        <div>操作</div>
+      </div>
+      <div id="tblRecipientsBody" class="list-body" style="max-height:60vh;overflow-y:auto;">
+        <div class="list-empty"><i class="ri-loader-4-line"></i>加载中…</div>
+      </div>
+    </div>
+  </div>
+
+  {# ---------- 右：编辑表单 ---------- #}
+  <div class="panel">
+    <div class="panel-h">
+      <h3 id="recipFormTitle"><i class="ri-user-add-line"></i> 新建收件人</h3>
+      <button class="btn btn-ghost btn-sm" id="btnCancelEdit" style="display:none">
+        <i class="ri-close-line"></i> 取消
+      </button>
+    </div>
+    <div class="panel-body">
+      <form id="recipForm" class="form">
+        <input type="hidden" id="rId">
+
+        <div class="section-title"><h2><i class="ri-user-line"></i> 基本信息</h2></div>
+        <div class="grid grid-2" style="gap:10px;">
+          <label class="field-group">
+            <span class="field-label">姓名 *</span>
+            <input id="rName" class="input" required>
+          </label>
+          <label class="field-group">
+            <span class="field-label">角色</span>
+            <input id="rRole" class="input" placeholder="如: 策略组长">
+          </label>
+        </div>
+
+        <div class="section-title"><h2><i class="ri-mail-line"></i> 联系方式</h2></div>
+        <label class="field-group">
+          <span class="field-label">邮箱</span>
+          <input id="rEmail" class="input" type="email" placeholder="user@example.com">
+        </label>
+        <label class="field-group" style="margin-top:8px;">
+          <span class="field-label">飞书 Webhook</span>
+          <input id="rWebhook" class="input"
+                 placeholder="https://open.feishu.cn/open-apis/bot/v2/hook/...">
+        </label>
+
+        <div class="section-title"><h2><i class="ri-checkbox-line"></i> 订阅项</h2></div>
+        <div class="checks">
+          <label><input type="checkbox" id="rSubHigh" checked>
+            <i class="ri-fire-line c-red"></i> 高影响告警</label>
+          <label><input type="checkbox" id="rSubOpportunity" checked>
+            <i class="ri-lightbulb-line c-green"></i> 机会推送</label>
+          <label><input type="checkbox" id="rSubDaily" checked>
+            <i class="ri-sun-line c-yellow"></i> 战略日报</label>
+          <label><input type="checkbox" id="rSubWeekly" checked>
+            <i class="ri-calendar-line c-blue"></i> 战略周报</label>
+        </div>
+
+        <div class="form-actions" style="margin-top:14px;">
+          <button class="btn btn-primary" type="submit">
+            <i class="ri-save-line"></i> 保存
+          </button>
+          <button class="btn btn-ghost" type="button" id="btnTestSend">
+            <i class="ri-send-plane-line"></i> 测试发送
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{# ===================== 发送日志 ===================== #}
+<div class="panel">
+  <div class="panel-h">
+    <h3><i class="ri-mail-send-line"></i> 发送日志 <span class="count" id="logTotalTag">—</span></h3>
+    <span class="muted text-xxs">多通道模板预览已迁至《战略简报 · 详情》面板, 与真实发送内容同源</span>
+  </div>
+  <div class="panel-body">
+    <div id="tplLogsPane" class="tpl-pane">
+      <div class="flex items-center gap-2 mb-2">
+        <select id="logChannel" class="select select-sm">
+          <option value="">全部通道</option>
+          <option value="feishu">飞书</option>
+          <option value="email">邮件</option>
+          <option value="websocket">WebSocket</option>
+        </select>
+        <select id="logStatus" class="select select-sm">
+          <option value="">全部状态</option>
+          <option value="sent">已发送</option>
+          <option value="failed">失败</option>
+          <option value="pending">待发送</option>
+          <option value="retrying">重试中</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" id="btnRefreshLogs">
+          <i class="ri-refresh-line"></i> 刷新
+        </button>
+        <span class="muted" style="margin-left:auto;font-size:var(--fz-xxs)" id="logMeta"></span>
+      </div>
+
+      <div class="list-head" style="grid-template-columns: 50px 80px 110px 1fr 1.6fr 90px 60px 130px 70px;">
+        <div>#</div><div>通道</div><div>事件</div><div>收件人</div>
+        <div>主题</div><div>状态</div><div>重试</div><div>时间</div><div>操作</div>
+      </div>
+      <div id="tblLogsBody" class="list-body" style="max-height:60vh;overflow-y:auto;">
+        <div class="list-empty"><i class="ri-loader-4-line"></i>加载中…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_script %}
+<script src="{% static 'js/notifications.js' %}"></script>
+{% endblock %}

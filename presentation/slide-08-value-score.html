@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>价值评分 · Strategic Radar</title>
+<link rel="stylesheet" href="assets/css/common.css">
+<style>
+.score-layout{display:grid;grid-template-columns:1fr 1.2fr;gap:24px;flex:1;}
+.score-left{display:flex;flex-direction:column;gap:14px;}
+.formula-box{background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(245,158,11,.06));
+  border:1px solid rgba(37,99,235,.3);border-radius:14px;padding:20px 22px;}
+.formula-label{font-size:11px;font-weight:700;color:var(--text-2);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;}
+.formula-text{font-size:15px;font-family:monospace;color:#93C5FD;line-height:1.8;}
+.formula-text .orange{color:#FCD34D;}
+.weight-bars{display:flex;flex-direction:column;gap:9px;}
+.w-row{display:flex;align-items:center;gap:10px;}
+.w-label{width:60px;font-size:13px;color:var(--text-2);flex-shrink:0;}
+.w-bar-bg{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
+.w-bar-fill{height:100%;border-radius:4px;}
+.w-val{width:24px;font-size:12px;color:var(--text-2);text-align:right;flex-shrink:0;}
+.score-right{display:flex;flex-direction:column;gap:12px;}
+.threshold-title{font-size:14px;font-weight:700;color:var(--text-2);
+  text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.thresh-item{display:flex;align-items:center;gap:12px;padding:10px 14px;
+  background:var(--bg-card);border:1px solid var(--border);border-radius:9px;}
+.thresh-range{font-size:22px;font-weight:800;min-width:50px;}
+.thresh-label{font-size:15px;font-weight:700;}
+.thresh-desc{font-size:13px;color:var(--text-2);}
+.thresh-action{margin-left:auto;font-size:12px;padding:3px 10px;border-radius:10px;}
+.example-box{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.ex-label{font-size:11px;color:var(--text-2);font-weight:700;text-transform:uppercase;margin-bottom:8px;}
+.ex-item{display:flex;align-items:center;gap:8px;font-size:13px;padding:4px 0;}
+.ex-title{flex:1;color:var(--text-2);}
+.ex-score{font-size:16px;font-weight:800;color:var(--accent);min-width:28px;text-align:right;}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="slide-header">
+    <div class="slide-logo"><span class="dot"></span> Strategic Radar</div>
+    <div id="slideChapter" class="slide-chapter muted"></div>
+    <div id="slideNum" class="slide-num"></div>
+  </div>
+  <div class="slide-body">
+    <h2 style="margin-bottom:6px;">4 维价值评分模型</h2>
+    <p class="muted" style="margin-bottom:16px;">将每条情报量化为 0-10 分，自动区分战略信号与噪声</p>
+    <div class="score-layout">
+      <div class="score-left">
+        <div class="formula-box">
+          <div class="formula-label">评分公式</div>
+          <div class="formula-text">
+            score = <span class="orange">4</span>·相关度<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="orange">3</span>·紧迫度<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="orange">2</span>·权威性<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="orange">1</span>·规模影响<br>
+            <span style="color:var(--text-2);font-size:13px;">（最高 10 分，自动归一化）</span>
+          </div>
+        </div>
+        <div>
+          <div class="threshold-title" style="margin-bottom:8px;">权重分配</div>
+          <div class="weight-bars">
+            <div class="w-row">
+              <span class="w-label">相关度</span>
+              <div class="w-bar-bg"><div class="w-bar-fill" style="width:40%;background:#60A5FA;"></div></div>
+              <span class="w-val">×4</span>
+            </div>
+            <div class="w-row">
+              <span class="w-label">紧迫度</span>
+              <div class="w-bar-bg"><div class="w-bar-fill" style="width:30%;background:#F59E0B;"></div></div>
+              <span class="w-val">×3</span>
+            </div>
+            <div class="w-row">
+              <span class="w-label">权威性</span>
+              <div class="w-bar-bg"><div class="w-bar-fill" style="width:20%;background:#10B981;"></div></div>
+              <span class="w-val">×2</span>
+            </div>
+            <div class="w-row">
+              <span class="w-label">规模</span>
+              <div class="w-bar-bg"><div class="w-bar-fill" style="width:10%;background:#A78BFA;"></div></div>
+              <span class="w-val">×1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="score-right">
+        <div class="threshold-title">阈值分级</div>
+        <div class="thresh-item">
+          <span class="thresh-range" style="color:#EF4444;">≥ 8</span>
+          <div>
+            <div class="thresh-label" style="color:#EF4444;">🔴 关键情报</div>
+            <div class="thresh-desc">立即触发高影响告警推送，飞书+邮件通知</div>
+          </div>
+          <span class="thresh-action tag tag-red">高影响告警</span>
+        </div>
+        <div class="thresh-item">
+          <span class="thresh-range" style="color:#F59E0B;">5-7</span>
+          <div>
+            <div class="thresh-label" style="color:#F59E0B;">🟡 中价值情报</div>
+            <div class="thresh-desc">进入 Daily 简报，按分数排序展示</div>
+          </div>
+          <span class="thresh-action tag tag-orange">进简报</span>
+        </div>
+        <div class="thresh-item">
+          <span class="thresh-range" style="color:#94A3B8;">3-4</span>
+          <div>
+            <div class="thresh-label">⚪ 低价值情报</div>
+            <div class="thresh-desc">存档备查，不主动展示，可按需检索</div>
+          </div>
+          <span class="thresh-action tag tag-gray">存档</span>
+        </div>
+        <div class="thresh-item">
+          <span class="thresh-range" style="color:rgba(148,163,184,.4);">&lt; 3</span>
+          <div>
+            <div class="thresh-label" style="color:var(--text-2);">🗑 噪声</div>
+            <div class="thresh-desc">自动丢弃，反馈到过滤黑名单</div>
+          </div>
+          <span class="thresh-action tag tag-gray">丢弃</span>
+        </div>
+        <div class="example-box">
+          <div class="ex-label">示例评分</div>
+          <div class="ex-item">
+            <span class="ex-title">美国加征关税 25% — 直接影响出口</span>
+            <span class="ex-score" style="color:#EF4444;">9.2</span>
+          </div>
+          <div class="ex-item">
+            <span class="ex-title">TikTok Shop 调整佣金费率</span>
+            <span class="ex-score" style="color:#F59E0B;">7.1</span>
+          </div>
+          <div class="ex-item">
+            <span class="ex-title">某竞品发布新品（相关度低）</span>
+            <span class="ex-score" style="color:#94A3B8;">3.4</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>← → 键盘翻页</span>
+    <div class="progress-bar"><div class="progress-bar-fill"></div></div>
+    <span>Strategic Radar · 2026</span>
+  </div>
+</div>
+<script src="assets/js/common.js"></script>
+</body>
+</html>

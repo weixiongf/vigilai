@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_intro %}
+<div class="page-intro">
+  <div class="breadcrumbs">
+    <span>战略情报</span><span class="sep">/</span>
+    <span>情报蓝图</span>
+  </div>
+  <h1><i class="ri-radar-line"></i> 情报蓝图</h1>
+  <div class="desc">
+    海外市场战略雷达 · 7 天 PEST / SWOT / 趋势 / 高影响告警一屏总览 ·
+    实时 WebSocket 推送
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{# ===================== Mini Stat Grid ===================== #}
+<div class="mini-stat-grid">
+  <div class="mini-stat kpi-clickable"
+       data-href="/dashboard/feed/?days=7"
+       title="查看近 7 天情报">
+    <div class="label">已分析情报</div>
+    <div class="num tnum" id="kpiTotal">--</div>
+    <div class="foot">最近 7 天累计</div>
+  </div>
+  <div class="mini-stat success kpi-clickable"
+       data-href="/dashboard/feed/?hours=24"
+       title="查看近 24 小时新增情报">
+    <div class="label">24h 新增</div>
+    <div class="num tnum" id="kpiNew24">--</div>
+    <div class="foot">同比 24h</div>
+  </div>
+  <div class="mini-stat danger kpi-clickable"
+       data-href="/dashboard/feed/?min_score=8&order=-impact_score"
+       title="查看高影响情报（影响分 ≥ 8）">
+    <div class="label">高影响 (≥8)</div>
+    <div class="num tnum" id="kpiHigh">--</div>
+    <div class="foot">24h <span id="kpiHigh24">0</span></div>
+  </div>
+  <div class="mini-stat warn kpi-clickable"
+       data-href="/dashboard/feed/?days=7&order=-impact_score"
+       title="查看近 7 天机会 / 威胁情报">
+    <div class="label">机会 / 威胁</div>
+    <div class="num" id="kpiOT" style="font-size:var(--fz-md)">--</div>
+    <div class="foot">7d 比例</div>
+  </div>
+</div>
+
+{# ===================== 双图: PEST + 维度 ===================== #}
+<div class="grid grid-2" style="gap:12px">
+  <div class="panel" style="max-height:360px;overflow:hidden;">
+    <div class="panel-h">
+      <h3><i class="ri-pie-chart-line"></i> PEST 分布 <span class="muted text-xxs ml-1">7d</span></h3>
+      <span class="muted">政治法律 · 经济 · 社会文化 · 技术</span>
+    </div>
+    <div class="panel-body" style="display:flex;align-items:center;justify-content:center;padding:14px;">
+      <canvas id="chartPEST" style="max-width:280px;max-height:280px;"></canvas>
+    </div>
+  </div>
+  <div class="panel" style="max-height:360px;overflow:hidden;">
+    <div class="panel-h">
+      <h3><i class="ri-radar-line"></i> 战略维度分布 <span class="muted text-xxs ml-1">7d</span></h3>
+    </div>
+    <div class="panel-body" style="height:280px;">
+      <canvas id="chartDim"></canvas>
+    </div>
+  </div>
+</div>
+
+{# ===================== 双区: 趋势 + Top 市场 ===================== #}
+<div class="grid grid-2" style="gap:12px">
+  <div class="panel">
+    <div class="panel-h">
+      <h3><i class="ri-line-chart-line"></i> 7 天情报趋势</h3>
+      <span class="muted">每日已分析数</span>
+    </div>
+    <div class="panel-body">
+      <canvas id="chartTrend" height="180"></canvas>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-h">
+      <h3><i class="ri-earth-line"></i> Top 10 目标市场</h3>
+    </div>
+    <div class="panel-body">
+      <div class="list-head" style="grid-template-columns: 2fr 1fr 1fr;">
+        <div>市场</div><div>条数</div><div title="该市场所有情报的平均影响分，满分 10">影响分<span class="muted text-xxs"> /10</span></div>
+      </div>
+      <div id="tblMarketBody" class="list-body">
+        <div class="list-empty"><i class="ri-loader-4-line"></i>加载中…</div>
+      </div>
+      <div style="margin-top:10px;height:120px;">
+        <canvas id="chartMarketLine"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ===================== 实时高影响告警 ===================== #}
+<div class="panel">
+  <div class="panel-h">
+    <h3><i class="ri-alarm-warning-line"></i> 实时高影响告警</h3>
+    <span class="muted">
+      <span class="verdict verdict-info">WebSocket 实时推送</span>
+      自动滚动
+    </span>
+  </div>
+  <div class="panel-body">
+    <div class="alert-list" id="alertList">
+      <div class="empty-state">
+        <i class="ri-shield-check-line"></i>
+        <div class="es-title">暂无告警</div>
+        <div class="es-sub">等待 Celery scan-high-impact 任务触发…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_script %}
+<script src="{% static 'js/cockpit.js' %}"></script>
+{% endblock %}

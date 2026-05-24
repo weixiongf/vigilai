@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_intro %}
+<div class="page-intro">
+  <div class="breadcrumbs">
+    <span>战略情报</span><span class="sep">/</span>
+    <span>信息源配置</span>
+  </div>
+  <h1><i class="ri-database-2-line"></i> 信息源配置</h1>
+  <div class="desc">
+    全站采集源的统一管控入口 · 支持类型、优先级、状态多维筛选 · 选中行后右侧面板查看详情、立即触发或切换启停
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{# ===================== Mini Stat Grid ===================== #}
+<div class="mini-stat-grid">
+  <div class="mini-stat">
+    <div class="label">信息源总数</div>
+    <div class="num" id="kpiSrcTotal">--</div>
+    <div class="foot">启用 <span id="kpiSrcActive">--</span></div>
+  </div>
+  <div class="mini-stat">
+    <div class="label">类型分布</div>
+    <div class="num tnum" id="kpiSrcTypes">--</div>
+    <div class="foot" id="kpiSrcTypesFoot">api / web / rss / social</div>
+  </div>
+  <div class="mini-stat success">
+    <div class="label">当前模式</div>
+    <div class="num" id="kpiSrcMode" style="font-size:var(--fz-md)">--</div>
+    <div class="foot">异常源 <span id="kpiSrcFailing">0</span></div>
+  </div>
+  <div class="mini-stat">
+    <div class="label">最近 24h 抓取</div>
+    <div class="num tnum" id="kpiSrcFetch24">--</div>
+    <div class="foot">新增 <span id="kpiSrcNew24">--</span></div>
+  </div>
+</div>
+
+{# ===================== 搜索栏 + 筛选 ===================== #}
+<div class="panel" style="padding:8px 10px;margin-bottom:8px;">
+  <div class="search-row">
+    <div class="searchbar">
+      <input id="srcQ" type="text" placeholder="搜索名称 / 类别 / 关键词…" autocomplete="off">
+    </div>
+    <button class="btn btn-ghost" id="btnSrcSearch" title="查询">
+      <i class="ri-search-line"></i>
+    </button>
+    <button class="btn btn-ghost" id="btnSrcReload" title="刷新">
+      <i class="ri-refresh-line"></i>
+    </button>
+  </div>
+
+  <div class="flex items-center gap-2 mb-1">
+    <select id="srcType" class="select select-sm">
+      <option value="">全部类型</option>
+      <option value="api">免费 API</option>
+      <option value="web">网页爬取</option>
+      <option value="rss">RSS / Atom</option>
+      <option value="social">社交媒体</option>
+      <option value="mixed">混合</option>
+    </select>
+    <select id="srcPriority" class="select select-sm">
+      <option value="">全部优先级</option>
+      <option value="critical">最高</option>
+      <option value="high">高</option>
+      <option value="medium">中</option>
+      <option value="low">低</option>
+    </select>
+    <select id="srcActive" class="select select-sm">
+      <option value="">全部状态</option>
+      <option value="1">仅启用</option>
+      <option value="0">仅禁用</option>
+    </select>
+    <span class="muted" id="srcTotalLabel" style="margin-left:auto;font-size:var(--fz-xxs)"></span>
+  </div>
+
+  {# 已选筛选条件 chips（由 JS 动态填充） #}
+  <div class="tagbar" id="srcTagbar">
+    <span class="tagbar-empty">未应用筛选条件</span>
+  </div>
+</div>
+
+{# ===================== 全宽列表 （详情在右侧抽屉） ===================== #}
+<div class="panel" style="margin-bottom:0;">
+  <div class="panel-h">
+    <h3>
+      <i class="ri-list-check"></i> 信息源列表
+      <span id="srcCountTag" class="muted"
+            style="font-weight:normal;font-size:var(--fz-sm);margin-left:2px;">（— 项）</span>
+    </h3>
+    <a href="{% url 'dashboard:source_create' %}" class="btn btn-ghost btn-sm"
+       id="btnSrcAdd" title="添加信息源" style="margin-left:6px;">
+      <i class="ri-add-circle-line"></i> 添加信息源
+    </a>
+  </div>
+  <div class="panel-body" style="display:flex; flex-direction:column;">
+    {# Grid 列表 — 全宽下多维字段呈现 #}
+    <div id="tblSourcesHead" class="list-head"
+         style="grid-template-columns: 36px 22px minmax(220px, 3fr) 110px 90px 110px 130px 80px 120px 96px;">
+      <div></div>
+      <div title="绿点=真实采集 / 灰点=仿真或未接入"></div>
+      <div>名称 / 类别</div>
+      <div>类型</div>
+      <div>优先级</div>
+      <div>访问层级</div>
+      <div>更新频率</div>
+      <div>状态</div>
+      <div>最近</div>
+      <div>操作</div>
+    </div>
+    <div id="tblSourcesBody" class="list-body">
+      <div class="list-empty"><i class="ri-loader-4-line"></i>加载中…</div>
+    </div>
+  </div>
+</div>
+
+{# ===================== 右侧抽屉 · 信息源详情 ===================== #}
+<aside id="srcDrawer" class="src-drawer" hidden aria-hidden="true"
+       role="dialog" aria-labelledby="srcDrawerTitle">
+  <div class="sd-head">
+    <h4 id="srcDrawerTitle">
+      <i class="ri-information-2-line"></i> 信息源详情
+      <span class="muted" id="srcDetailHint" style="font-weight:normal;font-size:var(--fz-xxs);margin-left:6px;"></span>
+    </h4>
+    <span class="sd-close" id="srcDrawerClose" title="关闭 (Esc)">
+      <i class="ri-close-line"></i>
+    </span>
+  </div>
+  <div class="sd-body">
+
+    <div class="empty-state" id="srcDetailEmpty" style="display:none;">
+      <i class="ri-cursor-line"></i>
+      <div class="es-title">尚未选择</div>
+      <div class="es-sub">从列表选择一个信息源以查看配置详情</div>
+    </div>
+
+    <div id="srcDetailContent">
+
+      <div class="section-title">
+        <h2><i class="ri-information-line"></i> 基础信息</h2>
+        <span class="extra"><span class="verdict" id="dStatusBadge">—</span></span>
+      </div>
+      <table class="kv-table">
+        <tbody>
+          <tr><th>名称</th>     <td id="dName">—</td></tr>
+          <tr><th>类别</th>     <td id="dCategory">—</td></tr>
+          <tr><th>类型</th>     <td id="dType">—</td></tr>
+          <tr><th>优先级</th>   <td id="dPriority">—</td></tr>
+          <tr><th>更新频率</th> <td id="dFreq">—</td></tr>
+          <tr><th>爬取间隔</th> <td><span id="dInterval">—</span> 秒</td></tr>
+          <tr><th>注册</th>     <td id="dRegister">—</td></tr>
+          <tr><th>登录</th>     <td id="dLogin">—</td></tr>
+          <tr><th>付费</th>     <td id="dPaid">—</td></tr>
+          <tr><th>Spider</th>   <td><code id="dSpider">—</code></td></tr>
+        </tbody>
+      </table>
+
+      <div class="section-title">
+        <h2><i class="ri-link"></i> 链接 & 状态</h2>
+      </div>
+      <table class="kv-table">
+        <tbody>
+          <tr><th>官网</th>
+              <td><a id="dOfficial" href="#" target="_blank" rel="noopener" class="linklike">—</a></td></tr>
+          <tr><th>最近状态</th>
+              <td><span id="dLastStatus" class="verdict">—</span></td></tr>
+          <tr><th>最近时间</th> <td id="dLastTime">—</td></tr>
+          <tr><th>最近消息</th> <td id="dLastMsg" style="white-space:normal;">—</td></tr>
+        </tbody>
+      </table>
+
+      <div class="form-actions" style="margin:12px 0 0 0">
+        <button class="btn btn-primary btn-sm" id="btnTrigger">
+          <i class="ri-play-line"></i> 立即触发采集
+        </button>
+        <button class="btn btn-sm" id="btnToggle">
+          <i class="ri-toggle-line"></i> 切换启停
+        </button>
+        <button class="btn btn-ghost btn-sm" id="btnRefreshDetail">
+          <i class="ri-refresh-line"></i> 刷新
+        </button>
+        <span class="flex-1"></span>
+        <button class="btn btn-ghost btn-sm" id="btnDelete"
+                style="color:var(--danger);" title="删除该信息源">
+          <i class="ri-delete-bin-line"></i> 删除
+        </button>
+      </div>
+
+      <div class="section-title">
+        <h2><i class="ri-history-line"></i> 最近 10 次采集</h2>
+      </div>
+      <div class="list-head" style="grid-template-columns: 1.4fr 0.8fr 1fr 0.8fr;">
+        <div>开始</div><div>状态</div><div>新增/抓取</div><div>触发</div>
+      </div>
+      <div id="tblDetailJobsBody" class="list-body" style="max-height:240px;overflow-y:auto;">
+        <div class="list-empty"><i class="ri-time-line"></i>暂无记录</div>
+      </div>
+
+    </div>
+  </div>
+</aside>
+
+{% endblock %}
+
+{% block extra_script %}
+<script src="{% static 'js/sources.js' %}"></script>
+{% endblock %}

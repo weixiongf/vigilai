@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>解决方案 · Strategic Radar</title>
+<link rel="stylesheet" href="assets/css/common.css">
+<style>
+.sol-layout{display:flex;flex-direction:column;gap:16px;flex:1;}
+.pipeline3{display:flex;align-items:stretch;gap:0;margin-bottom:4px;}
+.p3-step{flex:1;background:var(--bg-card);border:1px solid var(--border);
+  border-radius:10px;padding:18px 16px;position:relative;}
+.p3-step:not(:last-child){border-right:none;border-radius:10px 0 0 10px;}
+.p3-step:nth-child(3){border-radius:0 10px 10px 0;}
+.p3-step:nth-child(2){border-radius:0;border-right:none;}
+.p3-arrow{width:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  color:var(--primary);font-size:22px;background:var(--bg-card);
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.p3-layer{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-2);margin-bottom:8px;}
+.p3-title{font-size:16px;font-weight:700;margin-bottom:8px;}
+.p3-items{list-style:none;}
+.p3-items li{font-size:13px;color:var(--text-2);padding:3px 0;
+  display:flex;align-items:flex-start;gap:6px;}
+.p3-items li::before{content:'›';color:var(--primary);flex-shrink:0;}
+.kpi-row{display:flex;gap:14px;}
+.kpi-box{flex:1;background:var(--bg-card);border:1px solid var(--border);
+  border-radius:10px;padding:14px 18px;text-align:center;}
+.kpi-box .kpi-val{font-size:32px;font-weight:800;color:var(--accent);}
+.kpi-box .kpi-label{font-size:12px;color:var(--text-2);margin-top:4px;}
+.p3-step:nth-child(1){border-top:3px solid var(--primary);}
+.p3-step:nth-child(3){border-top:3px solid var(--accent);}
+.p3-step:nth-child(5){border-top:3px solid var(--success);}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="slide-header">
+    <div class="slide-logo"><span class="dot"></span> Strategic Radar</div>
+    <div id="slideChapter" class="slide-chapter muted"></div>
+    <div id="slideNum" class="slide-num"></div>
+  </div>
+  <div class="slide-body">
+    <h2 style="margin-bottom:6px;">解决方案 <span class="muted">·</span> 智能情报驾驶舱</h2>
+    <p class="muted" style="margin-bottom:16px;">三层架构，从原始信号到战略决策全链路覆盖</p>
+    <div class="sol-layout">
+      <div class="pipeline3">
+        <div class="p3-step">
+          <div class="p3-layer">Layer 1 · 采集层</div>
+          <div class="p3-title">多源数据接入</div>
+          <ul class="p3-items">
+            <li>113 个候选信息源</li>
+            <li>FRED / World Bank / GDELT 真实 API</li>
+            <li>仿真引擎 500 条种子兜底</li>
+            <li>Celery 定时任务自动采集</li>
+          </ul>
+        </div>
+        <div class="p3-arrow">→</div>
+        <div class="p3-step">
+          <div class="p3-layer">Layer 2 · 分析层</div>
+          <div class="p3-title">LLM 智能分析</div>
+          <ul class="p3-items">
+            <li>PEST 自动分类打标</li>
+            <li>O/T 机会/威胁方向判断</li>
+            <li>H/M/L 影响等级评级</li>
+            <li>4 维价值评分 0-10</li>
+          </ul>
+        </div>
+        <div class="p3-arrow">→</div>
+        <div class="p3-step">
+          <div class="p3-layer">Layer 3 · 决策层</div>
+          <div class="p3-title">洞察输出</div>
+          <ul class="p3-items">
+            <li>SWOT 矩阵 + 4 类策略</li>
+            <li>Daily / Weekly 简报</li>
+            <li>高影响告警推送</li>
+            <li>WebSocket 实时驾驶舱</li>
+          </ul>
+        </div>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi-box">
+          <div class="kpi-val">113</div>
+          <div class="kpi-label">注册信息源</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-val">500+</div>
+          <div class="kpi-label">仿真情报种子</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-val">5</div>
+          <div class="kpi-label">目标海外市场</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-val">8</div>
+          <div class="kpi-label">Celery 定时任务</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-val">4</div>
+          <div class="kpi-label">多智能体节点</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-val">3s</div>
+          <div class="kpi-label">WebSocket 推送延迟</div>
+        </div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;
+        padding:14px 20px;display:flex;align-items:center;gap:20px;">
+        <span style="font-size:13px;color:var(--text-2);">核心亮点：</span>
+        <span class="tag tag-blue">LLM Mock — 无需 API Key 即可演示</span>
+        <span class="tag tag-green">自动降级 — 真实失败时仿真兜底</span>
+        <span class="tag tag-orange">A2A 多智能体协调 — 链路可追溯</span>
+        <span class="tag tag-red">跨象限 SWOT 策略自动生成</span>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>← → 键盘翻页</span>
+    <div class="progress-bar"><div class="progress-bar-fill"></div></div>
+    <span>Strategic Radar · 2026</span>
+  </div>
+</div>
+<script src="assets/js/common.js"></script>
+</body>
+</html>

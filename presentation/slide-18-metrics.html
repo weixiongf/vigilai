@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>关键指标 · Strategic Radar</title>
+<link rel="stylesheet" href="assets/css/common.css">
+<style>
+.metrics-top{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px;}
+.m-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;
+  padding:20px 18px;text-align:center;}
+.m-card:nth-child(1){border-top:3px solid #60A5FA;}
+.m-card:nth-child(2){border-top:3px solid var(--accent);}
+.m-card:nth-child(3){border-top:3px solid var(--success);}
+.m-card:nth-child(4){border-top:3px solid #A78BFA;}
+.m-val{font-size:44px;font-weight:900;line-height:1;color:var(--accent);}
+.m-unit{font-size:16px;font-weight:700;color:var(--text-2);margin-left:2px;}
+.m-label{font-size:13px;color:var(--text-2);margin-top:6px;}
+.m-card:nth-child(1) .m-val{color:#60A5FA;}
+.m-card:nth-child(2) .m-val{color:var(--accent);}
+.m-card:nth-child(3) .m-val{color:var(--success);}
+.m-card:nth-child(4) .m-val{color:#A78BFA;}
+.metrics-table-wrap{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.metric-table{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.mt-header{background:var(--bg-card2);padding:10px 16px;font-size:12px;font-weight:700;
+  color:var(--text-2);text-transform:uppercase;letter-spacing:.07em;}
+.mt-row{display:flex;align-items:center;padding:8px 16px;border-bottom:1px solid var(--border);}
+.mt-row:last-child{border-bottom:none;}
+.mt-label{flex:1;font-size:13px;color:var(--text-2);}
+.mt-val{font-size:15px;font-weight:700;color:var(--text-1);}
+.mt-bar{width:80px;height:5px;background:var(--border);border-radius:3px;
+  margin-left:10px;overflow:hidden;}
+.mt-bar-fill{height:100%;border-radius:3px;background:var(--primary);}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="slide-header">
+    <div class="slide-logo"><span class="dot"></span> Strategic Radar</div>
+    <div id="slideChapter" class="slide-chapter muted"></div>
+    <div id="slideNum" class="slide-num"></div>
+  </div>
+  <div class="slide-body">
+    <h2 style="margin-bottom:6px;">关键指标 <span class="muted">/</span> 演示数据</h2>
+    <p class="muted" style="margin-bottom:14px;">系统实际运行数据，均为真实采集或确定性仿真生成</p>
+
+    <div class="metrics-top">
+      <div class="m-card">
+        <div class="m-val">113</div>
+        <div class="m-label">注册信息源</div>
+      </div>
+      <div class="m-card">
+        <div class="m-val">500<span class="m-unit">+</span></div>
+        <div class="m-label">仿真情报种子</div>
+      </div>
+      <div class="m-card">
+        <div class="m-val">30<span class="m-unit">+</span></div>
+        <div class="m-label">高影响告警</div>
+      </div>
+      <div class="m-card">
+        <div class="m-val">4</div>
+        <div class="m-label">智能体节点</div>
+      </div>
+    </div>
+
+    <div class="metrics-table-wrap">
+      <div class="metric-table">
+        <div class="mt-header">📊 数据规模</div>
+        <div class="mt-row">
+          <span class="mt-label">信息源 (critical 级)</span>
+          <span class="mt-val">38</span>
+          <div class="mt-bar"><div class="mt-bar-fill" style="width:38%;background:#EF4444;"></div></div>
+        </div>
+        <div class="mt-row">
+          <span class="mt-label">信息源 (high 级)</span>
+          <span class="mt-val">45</span>
+          <div class="mt-bar"><div class="mt-bar-fill" style="width:45%;background:#F59E0B;"></div></div>
+        </div>
+        <div class="mt-row">
+          <span class="mt-label">覆盖目标市场</span>
+          <span class="mt-val">5</span>
+          <div class="mt-bar"><div class="mt-bar-fill" style="width:100%;background:#10B981;"></div></div>
+        </div>
+        <div class="mt-row">
+          <span class="mt-label">PEST 快照 (近7天)</span>
+          <span class="mt-val">7</span>
+          <div class="mt-bar"><div class="mt-bar-fill" style="width:70%;background:#60A5FA;"></div></div>
+        </div>
+        <div class="mt-row">
+          <span class="mt-label">SWOT 分析 (5市场)</span>
+          <span class="mt-val">5</span>
+          <div class="mt-bar"><div class="mt-bar-fill" style="width:50%;background:#A78BFA;"></div></div>
+        </div>
+        <div class="mt-row">
+          <span class="mt-label">Daily 简报样本</span>
+          <span class="mt-val">7</span>
+          <div class="mt-bar"><div class="mt-bar-fill" style="width:70%;background:#10B981;"></div></div>
+        </div>
+      </div>
+      <div class="metric-table">
+        <div class="mt-header">⚡ 性能指标</div>
+        <div class="mt-row">
+          <span class="mt-label">告警推送响应时间</span>
+          <span class="mt-val">&lt; 5s</span>
+          <div class="mt-bar"><div class="mt-bar-fill" style="width:90%;background:#10B981;"></div></div>
+        </div>
+        <div class="mt-row">
+          <span class="mt-label">WebSocket 实时延迟</span>
+          <span class="mt-val">&lt; 3s</span>
+          <div class="mt-bar"><div class="mt-bar-fill" style="width:95%;background:#10B981;"></div></div>
+        </div>
+        <div class="mt-row">
+          <span class="mt-label">采集成功率 (仿真)</span>
+          <span class="mt-val">100%</span>
+          <div class="mt-bar"><div class="mt-bar-fill" style="width:100%;background:#10B981;"></div></div>
+        </div>
+        <div class="mt-row">
+          <span class="mt-label">Celery 定时任务</span>
+          <span class="mt-val">8 条</span>
+          <div class="mt-bar"><div class="mt-bar-fill" style="width:80%;background:#60A5FA;"></div></div>
+        </div>
+        <div class="mt-row">
+          <span class="mt-label">战略主题覆盖</span>
+          <span class="mt-val">20+</span>
+          <div class="mt-bar"><div class="mt-bar-fill" style="width:85%;background:#F59E0B;"></div></div>
+        </div>
+        <div class="mt-row">
+          <span class="mt-label">推送渠道数</span>
+          <span class="mt-val">3</span>
+          <div class="mt-bar"><div class="mt-bar-fill" style="width:60%;background:#A78BFA;"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>← → 键盘翻页</span>
+    <div class="progress-bar"><div class="progress-bar-fill"></div></div>
+    <span>Strategic Radar · 2026</span>
+  </div>
+</div>
+<script src="assets/js/common.js"></script>
+</body>
+</html>

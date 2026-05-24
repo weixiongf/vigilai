@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_intro %}
+<div class="page-intro">
+  <div class="breadcrumbs">
+    <span>战略情报</span><span class="sep">/</span>
+    <span>采集调度</span>
+  </div>
+  <h1><i class="ri-time-line"></i> 采集调度</h1>
+  <div class="desc">
+    Celery Beat 周期任务监控 · 最近采集任务实时刷新（30s）·
+    信息源 CRUD 已迁移到 <a href="{% url 'dashboard:sources' %}" class="linklike">信息源配置</a> 页面
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{# ===== Mini Stat Grid (点击过滤任务列表) ===== #}
+<div class="mini-stat-grid">
+  <div class="mini-stat kpi-clickable" data-filter="all" title="点击查看：全部任务（不过滤）">
+    <div class="label">信息源</div>
+    <div class="num tnum" id="kpiSrcTotal">--</div>
+    <div class="foot">启用 <span id="kpiSrcActive">--</span></div>
+  </div>
+  <div class="mini-stat success kpi-clickable" data-filter="completed" title="点击查看：已完成任务">
+    <div class="label">最近抓取</div>
+    <div class="num tnum" id="kpiFetched">--</div>
+    <div class="foot">新增 <span id="kpiNewItems">--</span></div>
+  </div>
+  <div class="mini-stat kpi-clickable" data-filter="running" title="点击查看：运行中任务">
+    <div class="label">运行中任务</div>
+    <div class="num tnum" id="kpiJobsRunning">--</div>
+    <div class="foot">已完成 <span id="kpiJobsDone">--</span></div>
+  </div>
+  <div class="mini-stat danger kpi-clickable" data-filter="failed" title="点击查看：失败任务">
+    <div class="label">失败任务</div>
+    <div class="num tnum" id="kpiJobsFail">--</div>
+    <div class="foot">需排查</div>
+  </div>
+</div>
+
+{# ===== 最近采集任务 ===== #}
+<div class="panel">
+  <div class="panel-h">
+    <h3><i class="ri-history-line"></i> 最近采集任务</h3>
+    <span class="muted">实时刷新 · 30s 自动重载</span>
+  </div>
+  <div class="panel-body">
+    <div class="list-head" style="grid-template-columns: 28px 22px 1.6fr 1.4fr 110px 1fr 100px;">
+      <div></div>
+      <div title="绿点=真实采集 / 灰点=仿真或未接入"></div>
+      <div>信息源</div>
+      <div>开始</div>
+      <div>状态</div>
+      <div>新增 / 抓取</div>
+      <div>触发</div>
+    </div>
+    <div id="tblJobsBody" class="list-body" style="max-height:50vh;overflow-y:auto;">
+      <div class="list-empty"><i class="ri-loader-4-line"></i>加载中…</div>
+    </div>
+  </div>
+</div>
+
+{# ===== Celery Beat 周期调度 ===== #}
+<div class="panel">
+  <div class="panel-h">
+    <h3><i class="ri-calendar-event-line"></i> Celery Beat 周期调度</h3>
+    <span class="verdict verdict-ok"><i class="ri-pulse-line"></i> 7 个任务运行中</span>
+  </div>
+  <div class="panel-body">
+    <div class="list-head" style="grid-template-columns: 1.4fr 0.8fr 2fr;">
+      <div>任务名</div>
+      <div>调度</div>
+      <div>说明</div>
+    </div>
+    <div class="list-row" style="grid-template-columns: 1.4fr 0.8fr 2fr;">
+      <div><code>crawl-active-sources</code></div>
+      <div>每 30 分钟</div>
+      <div>主动触发活跃信息源采集</div>
+    </div>
+    <div class="list-row" style="grid-template-columns: 1.4fr 0.8fr 2fr;">
+      <div><code>analyze-pending-intel</code></div>
+      <div>每 10 分钟</div>
+      <div>把新增 RawInfo 推入 LLM 分析</div>
+    </div>
+    <div class="list-row" style="grid-template-columns: 1.4fr 0.8fr 2fr;">
+      <div><code>scan-high-impact</code></div>
+      <div>每 15 分钟</div>
+      <div>扫描高影响情报并推送告警</div>
+    </div>
+    <div class="list-row" style="grid-template-columns: 1.4fr 0.8fr 2fr;">
+      <div><code>generate-daily-briefing</code></div>
+      <div>每日 09:00</div>
+      <div>生成 Top 市场战略日报</div>
+    </div>
+    <div class="list-row" style="grid-template-columns: 1.4fr 0.8fr 2fr;">
+      <div><code>generate-weekly-briefing</code></div>
+      <div>每周一 09:00</div>
+      <div>生成战略周报</div>
+    </div>
+    <div class="list-row" style="grid-template-columns: 1.4fr 0.8fr 2fr;">
+      <div><code>rebuild-pest-swot-daily</code></div>
+      <div>每日 00:30</div>
+      <div>重算 PEST + SWOT 快照</div>
+    </div>
+    <div class="list-row" style="grid-template-columns: 1.4fr 0.8fr 2fr;">
+      <div><code>process-pending-notifications</code></div>
+      <div>每 1 分钟</div>
+      <div>消费 NotificationLog 待发送队列</div>
+    </div>
+  </div>
+</div>
+
+<p class="muted text-c" style="margin:14px 0 4px;font-size:var(--fz-xxs);">
+  <i class="ri-information-line"></i>
+  数据源降级模式开关在
+  <a href="{% url 'dashboard:settings' %}" class="linklike">系统配置</a> 页面
+</p>
+
+{# ===== 右侧抽屉 — 采集任务详情（复用 .src-drawer 样式） ===== #}
+<aside id="jobDrawer" class="src-drawer" hidden aria-hidden="true"
+       role="dialog" aria-labelledby="jobDrawerTitle">
+  <div class="sd-head">
+    <h4 id="jobDrawerTitle">
+      <i class="ri-database-2-line"></i> 采集任务详情
+      <span class="muted" id="jobDetailHint"
+            style="font-weight:normal;font-size:var(--fz-xxs);margin-left:6px;"></span>
+    </h4>
+    <span class="sd-close" id="jobDrawerClose" title="关闭 (Esc)">
+      <i class="ri-close-line"></i>
+    </span>
+  </div>
+  <div class="sd-body">
+
+    <div id="jobDetailContent">
+
+      <div class="section-title">
+        <h2><i class="ri-information-line"></i> 任务基础</h2>
+        <span class="extra"><span class="verdict" id="jdStatus">—</span></span>
+      </div>
+      <table class="kv-table">
+        <tbody>
+          <tr><th>信息源</th>   <td id="jdSource">—</td></tr>
+          <tr><th>Spider</th>   <td><code id="jdSpider">—</code>
+              <span id="jdRealBadge" class="verdict" style="margin-left:8px;"></span></td></tr>
+          <tr><th>开始</th>     <td id="jdStarted">—</td></tr>
+          <tr><th>结束</th>     <td id="jdFinished">—</td></tr>
+          <tr><th>耗时</th>     <td id="jdElapsed">—</td></tr>
+          <tr><th>新增 / 抓取</th> <td><b id="jdItemsNew">0</b> / <span id="jdItemsFetched">0</span></td></tr>
+          <tr><th>触发</th>     <td id="jdTrigger">—</td></tr>
+          <tr><th>官网</th>     <td><a id="jdOfficial" href="#" target="_blank"
+              rel="noopener" class="linklike">—</a></td></tr>
+        </tbody>
+      </table>
+
+      <div id="jdErrorWrap" style="display:none;">
+        <div class="section-title">
+          <h2><i class="ri-alert-line"></i> 错误日志</h2>
+        </div>
+        <pre id="jdError" style="background:var(--gray-200);border-radius:var(--r-sm);
+             padding:8px 10px;margin:0;max-height:160px;overflow:auto;
+             font-size:var(--fz-xxs);color:var(--danger);white-space:pre-wrap;"></pre>
+      </div>
+
+      <div class="section-title">
+        <h2><i class="ri-list-check-2"></i> 采集到的数据</h2>
+        <span class="extra muted" id="jdItemsHint">—</span>
+      </div>
+      <div id="jdItemsBody" class="list-body" style="max-height:55vh;overflow-y:auto;">
+        <div class="list-empty"><i class="ri-time-line"></i>加载中…</div>
+      </div>
+
+    </div>
+  </div>
+</aside>
+
+{% endblock %}
+
+{% block extra_script %}
+<script src="{% static 'js/scheduling.js' %}"></script>
+{% endblock %}

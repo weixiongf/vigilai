@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>五大维度 · Strategic Radar</title>
+<link rel="stylesheet" href="assets/css/common.css">
+<style>
+.dim-layout{display:flex;gap:24px;flex:1;align-items:stretch;}
+.dim-list{display:flex;flex-direction:column;gap:12px;flex:1;}
+.dim-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;
+  padding:16px 20px;display:flex;align-items:flex-start;gap:14px;}
+.dim-icon{font-size:26px;flex-shrink:0;margin-top:2px;}
+.dim-num{font-size:11px;font-weight:700;color:var(--text-2);letter-spacing:.1em;
+  text-transform:uppercase;}
+.dim-name{font-size:16px;font-weight:700;margin:3px 0 5px;}
+.dim-desc{font-size:13px;color:var(--text-2);line-height:1.5;}
+.dim-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+.dim-card:nth-child(1){border-left:3px solid #EF4444;}
+.dim-card:nth-child(2){border-left:3px solid var(--primary);}
+.dim-card:nth-child(3){border-left:3px solid var(--accent);}
+.dim-card:nth-child(4){border-left:3px solid var(--success);}
+.dim-card:nth-child(5){border-left:3px solid #A78BFA;}
+/* 五边形示意 */
+.pentagon-wrap{width:280px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+svg.penta text{fill:var(--text-2);font-size:12px;}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="slide-header">
+    <div class="slide-logo"><span class="dot"></span> Strategic Radar</div>
+    <div id="slideChapter" class="slide-chapter muted"></div>
+    <div id="slideNum" class="slide-num"></div>
+  </div>
+  <div class="slide-body">
+    <h2 style="margin-bottom:14px;">系统五大战略维度</h2>
+    <div class="dim-layout">
+      <div class="dim-list">
+        <div class="dim-card">
+          <div class="dim-icon">🎯</div>
+          <div>
+            <div class="dim-num">维度 01</div>
+            <div class="dim-name">竞争维度</div>
+            <div class="dim-desc">竞品动作、定价策略、新品发布、并购重组、市场份额变化</div>
+            <div class="dim-tags"><span class="tag tag-red">竞品监控</span><span class="tag tag-gray">并购</span></div>
+          </div>
+        </div>
+        <div class="dim-card">
+          <div class="dim-icon">🛍️</div>
+          <div>
+            <div class="dim-num">维度 02</div>
+            <div class="dim-name">产品维度</div>
+            <div class="dim-desc">消费趋势、品类机会、消费者评价、需求变化、爆款品类</div>
+            <div class="dim-tags"><span class="tag tag-blue">品类趋势</span><span class="tag tag-gray">评价分析</span></div>
+          </div>
+        </div>
+        <div class="dim-card">
+          <div class="dim-icon">🌐</div>
+          <div>
+            <div class="dim-num">维度 03</div>
+            <div class="dim-name">平台维度</div>
+            <div class="dim-desc">Amazon / TikTok Shop / Shopee 规则变化、佣金调整、流量政策</div>
+            <div class="dim-tags"><span class="tag tag-orange">平台规则</span><span class="tag tag-gray">Amazon</span><span class="tag tag-gray">TikTok</span><span class="tag tag-green">✓ 已接入</span></div>
+          </div>
+        </div>
+        <div class="dim-card">
+          <div class="dim-icon">💬</div>
+          <div>
+            <div class="dim-num">维度 04</div>
+            <div class="dim-name">社媒维度</div>
+            <div class="dim-desc">KOL 内容方向、话题热度、品牌口碑、社媒舆情、病毒式传播</div>
+            <div class="dim-tags"><span class="tag tag-green">舆情监控</span><span class="tag tag-gray">KOL</span></div>
+          </div>
+        </div>
+        <div class="dim-card">
+          <div class="dim-icon">⚖️</div>
+          <div>
+            <div class="dim-num">维度 05</div>
+            <div class="dim-name">法规维度</div>
+            <div class="dim-desc">关税政策、出口管制、数据保护法规、合规要求、认证变化</div>
+            <div class="dim-tags"><span class="tag tag-red">关税</span><span class="tag tag-red">合规</span><span class="tag tag-gray">数据保护</span><span class="tag tag-green">✓ FDA/FTC/USTR/EU</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="pentagon-wrap">
+        <svg class="penta" viewBox="-160 -160 320 320" width="260" height="260">
+          <!-- 背景五边形网格 -->
+          <polygon points="0,-110 104.6,-34 64.7,90 -64.7,90 -104.6,-34"
+            fill="none" stroke="rgba(37,99,235,.15)" stroke-width="1"/>
+          <polygon points="0,-75 71.5,-23.1 44.2,61.4 -44.2,61.4 -71.5,-23.1"
+            fill="none" stroke="rgba(37,99,235,.12)" stroke-width="1"/>
+          <polygon points="0,-40 38,-12.3 23.5,32.7 -23.5,32.7 -38,-12.3"
+            fill="none" stroke="rgba(37,99,235,.1)" stroke-width="1"/>
+          <!-- 数据五边形 -->
+          <polygon points="0,-95 90,-29 55.8,77.5 -55.8,77.5 -90,-29"
+            fill="rgba(37,99,235,.18)" stroke="rgba(37,99,235,.8)" stroke-width="2"/>
+          <!-- 顶点 -->
+          <circle cx="0" cy="-95" r="5" fill="#F59E0B"/>
+          <circle cx="90" cy="-29" r="5" fill="#EF4444"/>
+          <circle cx="55.8" cy="77.5" r="5" fill="#10B981"/>
+          <circle cx="-55.8" cy="77.5" r="5" fill="#A78BFA"/>
+          <circle cx="-90" cy="-29" r="5" fill="#F59E0B"/>
+          <!-- 标签 -->
+          <text x="0" y="-120" text-anchor="middle" font-weight="700" fill="#F59E0B" font-size="13">竞争</text>
+          <text x="118" y="-24" text-anchor="start" font-weight="700" fill="#EF4444" font-size="13">平台</text>
+          <text x="68" y="96" text-anchor="start" font-weight="700" fill="#10B981" font-size="13">社媒</text>
+          <text x="-90" y="96" text-anchor="end" font-weight="700" fill="#A78BFA" font-size="13">法规</text>
+          <text x="-120" y="-24" text-anchor="end" font-weight="700" fill="#60A5FA" font-size="13">产品</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>← → 键盘翻页</span>
+    <div class="progress-bar"><div class="progress-bar-fill"></div></div>
+    <span>Strategic Radar · 2026</span>
+  </div>
+</div>
+<script src="assets/js/common.js"></script>
+</body>
+</html>

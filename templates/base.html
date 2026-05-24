@@ -1,0 +1,139 @@
+{% load static %}<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>{{ page_title|default:"情报蓝图" }} · 海外市场战略情报 Agent</title>
+  <!-- 字体：使用系统字体栈，无外部依赖，零延迟 -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body data-page="{{ page }}" data-domain="{{ domain|default:'intel' }}">
+
+{# ===================== 顶栏 · 主导航 (4 大产品域) ===================== #}
+<header class="appbar" role="banner">
+  <div class="appbar-brand" aria-label="Strategic Radar · 海外市场战略情报 Agent">
+    <i class="ri-radar-line brand-ico" aria-hidden="true"></i>
+    <span class="brand-name">Strategic Radar</span>
+    <span class="brand-tag">海外市场战略情报 Agent</span>
+  </div>
+  <nav class="appbar-nav" role="navigation" aria-label="产品域主导航">
+    <a class="appbar-tab {% if domain == 'intel' or not domain %}active{% endif %}"
+       href="{% url 'dashboard:cockpit' %}" data-domain="intel">
+      <i class="ri-radar-line" aria-hidden="true"></i><span>战略情报</span>
+    </a>
+    <a class="appbar-tab disabled" href="javascript:void(0)" data-domain="collab"
+       title="即将上线" aria-disabled="true" tabindex="-1">
+      <i class="ri-team-line" aria-hidden="true"></i><span>协作沟通</span>
+    </a>
+    <a class="appbar-tab disabled" href="javascript:void(0)" data-domain="exec"
+       title="即将上线" aria-disabled="true" tabindex="-1">
+      <i class="ri-rocket-2-line" aria-hidden="true"></i><span>执行辅助</span>
+    </a>
+    <a class="appbar-tab disabled" href="javascript:void(0)" data-domain="risk"
+       title="即将上线" aria-disabled="true" tabindex="-1">
+      <i class="ri-shield-keyhole-line" aria-hidden="true"></i><span>风控合规</span>
+    </a>
+  </nav>
+  <div class="appbar-right">
+    <span id="liveAlertCount" class="alert-pill" title="今日高影响告警">
+      <i class="ri-alarm-warning-line"></i><b>0</b>
+    </span>
+    <span id="clockTime" class="clock"></span>
+    <span class="ws-indicator" title="实时连接状态">
+      <span class="dot" id="wsDot"></span>
+      <span id="wsLabel" class="muted">连接中...</span>
+    </span>
+  </div>
+</header>
+
+{# ===================== 全局加载进度条 ===================== #}
+<div id="globalProgress" class="global-progress"></div>
+
+{# ===================== 侧栏 · 子菜单 (7 步业务流程 + 智能体控制台) ===================== #}
+<aside class="sidebar" role="complementary">
+  <div class="side-section-title">
+    {% if domain == 'collab' %}协作沟通
+    {% elif domain == 'exec' %}执行辅助
+    {% elif domain == 'risk' %}风控合规
+    {% else %}战略情报{% endif %}
+  </div>
+  <nav class="sidenav" role="navigation" aria-label="业务流程子菜单">
+    <a class="sidenav-item {% if page == 'cockpit' %}active{% endif %}"
+       href="{% url 'dashboard:cockpit' %}">
+      <i class="ri-dashboard-3-line"></i>
+      <span class="sn-text">情报蓝图</span>
+      <span class="sn-step">01</span>
+    </a>
+    <a class="sidenav-item {% if page == 'briefing' %}active{% endif %}"
+       href="{% url 'dashboard:briefing' %}">
+      <i class="ri-newspaper-line"></i>
+      <span class="sn-text">今日简报</span>
+      <span class="sn-step">02</span>
+    </a>
+    <a class="sidenav-item {% if page == 'feed' or page == 'timeline' %}active{% endif %}"
+       href="{% url 'dashboard:feed' %}">
+      <i class="ri-pulse-line"></i>
+      <span class="sn-text">市场动态</span>
+      <span class="sn-step">03</span>
+    </a>
+    <a class="sidenav-item {% if page == 'scheduling' %}active{% endif %}"
+       href="{% url 'dashboard:scheduling' %}">
+      <i class="ri-time-line"></i>
+      <span class="sn-text">采集调度</span>
+      <span class="sn-step">04</span>
+    </a>
+    <a class="sidenav-item {% if page == 'sources' %}active{% endif %}"
+       href="{% url 'dashboard:sources' %}">
+      <i class="ri-database-2-line"></i>
+      <span class="sn-text">信息源配置</span>
+      <span class="sn-step">05</span>
+    </a>
+    <a class="sidenav-item {% if page == 'notifications' %}active{% endif %}"
+       href="{% url 'dashboard:notifications' %}">
+      <i class="ri-notification-3-line"></i>
+      <span class="sn-text">通知记录</span>
+      <span class="sn-step">06</span>
+    </a>
+    <a class="sidenav-item {% if page == 'settings' %}active{% endif %}"
+       href="{% url 'dashboard:settings' %}">
+      <i class="ri-settings-4-line"></i>
+      <span class="sn-text">系统配置</span>
+      <span class="sn-step">07</span>
+    </a>
+    <a class="sidenav-item {% if page == 'agents' %}active{% endif %}"
+       href="{% url 'dashboard:agents' %}">
+      <i class="ri-robot-2-line"></i>
+      <span class="sn-text">智能体控制台</span>
+      <span class="sn-step">08</span>
+    </a>
+  </nav>
+  <div class="side-foot muted">
+    <i class="ri-information-line"></i>
+    实时数据 · 多智能体协作
+  </div>
+</aside>
+
+{# ===================== 主内容区 ===================== #}
+<main class="main">
+  <section class="content">
+    {% block page_intro %}{% endblock %}
+    <div class="page-actions-bar">
+      {% block page_actions %}{% endblock %}
+    </div>
+    {% block content %}{% endblock %}
+  </section>
+</main>
+
+<div id="toastStack" class="toast-stack"></div>
+
+<script src="{% static 'js/app.js' %}"></script>
+<script src="{% static 'js/markets.js' %}"></script>
+{% block extra_script %}{% endblock %}
+</body>
+</html>

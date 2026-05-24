@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_intro %}
+<div class="page-intro">
+  <div class="breadcrumbs">
+    <span>战略情报</span><span class="sep">/</span>
+    <span>市场动态</span><span class="sep">/</span>
+    <span>事件时间线</span>
+  </div>
+  <h1><i class="ri-time-line"></i> 事件时间线</h1>
+  <div class="desc">
+    按时间轴聚合关键市场变化 · 支持市场 / 时间窗口 / 影响分阈值筛选 ·
+    点击事件查看完整 LLM 分析与战略含义
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{# ===================== 工具栏 ===================== #}
+<div class="panel" style="padding:8px 10px;margin-bottom:8px;">
+  <div class="flex items-center gap-2">
+    <span class="field-label" style="margin:0;">筛选</span>
+    <select id="tlMarket" class="select select-sm"
+            data-fill="markets" data-include-all="1">
+      <option value="">全部市场</option>
+    </select>
+    <select id="tlDays" class="select select-sm">
+      <option value="3">最近 3 天</option>
+      <option value="7" selected>最近 7 天</option>
+      <option value="14">最近 14 天</option>
+      <option value="30">最近 30 天</option>
+    </select>
+    <select id="tlMinScore" class="select select-sm">
+      <option value="0">全部影响</option>
+      <option value="3" selected>≥ 3 分</option>
+      <option value="5">≥ 5 分</option>
+      <option value="8">≥ 8 分（高影响）</option>
+    </select>
+    <button class="btn btn-ghost btn-sm" id="btnTlRefresh">
+      <i class="ri-refresh-line"></i> 刷新
+    </button>
+    <span class="muted" id="tlMeta" style="margin-left:auto;font-size:var(--fz-xxs);">—</span>
+  </div>
+</div>
+
+{# ===================== 时间线 ===================== #}
+<div class="grid grid-2" style="gap:12px;grid-template-columns:3fr 2fr;">
+  <div class="panel">
+    <div class="panel-h">
+      <h3><i class="ri-history-line"></i> 事件时间线</h3>
+      <span class="muted">点击条目查看详情</span>
+    </div>
+    <div class="panel-body">
+      <div class="timeline" id="timelineWrap" style="max-height:70vh;overflow-y:auto;">
+        <div class="list-empty"><i class="ri-loader-4-line"></i>加载中…</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-h">
+      <h3><i class="ri-file-search-line"></i> 事件详情</h3>
+    </div>
+    <div class="panel-body">
+      <div class="timeline-detail" id="tlDetail" style="max-height:70vh;overflow-y:auto;">
+        <div class="empty-state">
+          <i class="ri-cursor-line"></i>
+          <div class="es-title">尚未选择事件</div>
+          <div class="es-sub">从时间线选择一条事件查看完整分析</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_script %}
+<script src="{% static 'js/timeline.js' %}"></script>
+{% endblock %}

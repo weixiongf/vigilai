@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_intro %}
+<div class="page-intro">
+  <div class="breadcrumbs">
+    <span>战略情报</span><span class="sep">/</span>
+    <span>智能体控制台</span>
+  </div>
+  <div class="intro-h1-row">
+  <h1><i class="ri-robot-2-line"></i> 智能体控制台</h1>
+  <div class="intro-actions">
+    <button class="btn btn-primary" id="btnRunPipeline">
+      <i class="ri-play-circle-line"></i> 启动 Pipeline
+    </button>
+  </div>
+  </div>
+  <div class="desc">
+    A2A 多智能体协作链路：
+    <span class="verdict verdict-info">Collector</span>
+    <i class="ri-arrow-right-s-line"></i>
+    <span class="verdict verdict-info">Classifier</span>
+    <i class="ri-arrow-right-s-line"></i>
+    <span class="verdict verdict-info">Briefer</span>
+    <i class="ri-arrow-right-s-line"></i>
+    <span class="verdict verdict-info">Dispatcher</span>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{# ===================== 触发面板 ===================== #}
+<div class="panel">
+  <div class="panel-h">
+    <h3><i class="ri-settings-3-line"></i> Pipeline 触发配置</h3>
+    <span class="muted">A2A 协作链路</span>
+  </div>
+  <div class="panel-body">
+    <div class="flex items-center gap-3">
+      <label class="field-group">
+        <span class="field-label">目标市场</span>
+        <select id="pipelineMarket" class="select" data-fill="markets"
+                data-include-global="1" data-default="global">
+          <option value="global">Global (全市场)</option>
+        </select>
+      </label>
+      <label class="field-group">
+        <span class="field-label">简报周期</span>
+        <select id="pipelinePeriod" class="select">
+          <option value="daily">日报</option>
+          <option value="weekly">周报</option>
+        </select>
+      </label>
+      <label class="field-group">
+        <span class="field-label">采集源数量 <span id="limitVal">3</span></span>
+        <input type="range" id="pipelineLimit" min="1" max="10" value="3"
+               oninput="document.getElementById('limitVal').textContent=this.value"
+               style="width:140px">
+      </label>
+      <button class="btn btn-primary" id="btnRunPipelineInline" style="margin-left:auto">
+        <i class="ri-play-circle-line"></i> 执行
+      </button>
+    </div>
+    <div id="pipelineStatus" class="muted" style="margin-top:8px;min-height:20px;font-size:var(--fz-xxs)"></div>
+  </div>
+</div>
+
+{# ===================== 节点状态 ===================== #}
+<div class="panel">
+  <div class="panel-h">
+    <h3><i class="ri-node-tree"></i> 节点执行状态</h3>
+    <button class="btn btn-ghost btn-sm" id="btnRefreshNodes">
+      <i class="ri-refresh-line"></i> 刷新
+    </button>
+  </div>
+  <div class="panel-body">
+    <div class="mini-stat-grid" id="nodeCards">
+      <div class="mini-stat" id="nodeCollector">
+        <div class="label">Collector 采集器</div>
+        <div class="num tnum" id="ncTotal0">--</div>
+        <div class="foot" id="ncStatus0">未知</div>
+      </div>
+      <div class="mini-stat" id="nodeClassifier">
+        <div class="label">Classifier 分类器</div>
+        <div class="num tnum" id="ncTotal1">--</div>
+        <div class="foot" id="ncStatus1">未知</div>
+      </div>
+      <div class="mini-stat" id="nodeBriefer">
+        <div class="label">Briefer 简报器</div>
+        <div class="num tnum" id="ncTotal2">--</div>
+        <div class="foot" id="ncStatus2">未知</div>
+      </div>
+      <div class="mini-stat" id="nodeDispatcher">
+        <div class="label">Dispatcher 分发器</div>
+        <div class="num tnum" id="ncTotal3">--</div>
+        <div class="foot" id="ncStatus3">未知</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ===================== 追溯链路 ===================== #}
+<div class="panel">
+  <div class="panel-h">
+    <h3><i class="ri-git-branch-line"></i> 最近 Pipeline 追溯链路</h3>
+    <div class="search-row" style="margin:0;width:280px;">
+      <div class="searchbar">
+        <input id="traceInput" type="text" placeholder="输入 trace_id 查询…">
+      </div>
+      <button class="btn btn-ghost" id="btnQueryTrace" title="查询">
+        <i class="ri-search-line"></i>
+      </button>
+    </div>
+  </div>
+  <div class="panel-body" style="padding:0;">
+    <div id="traceTimeline" class="trace-canvas-wrap">
+      <div class="empty-state">
+        <i class="ri-flow-chart"></i>
+        <div class="es-title">尚未执行</div>
+        <div class="es-sub">执行一次 Pipeline 后，追溯链路将显示在这里</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ===================== 消息日志 ===================== #}
+<div class="panel">
+  <div class="panel-h">
+    <h3><i class="ri-list-check-2"></i> AgentMessageLog（最近 50 条）</h3>
+    <button class="btn btn-ghost btn-sm" id="btnRefreshLogs">
+      <i class="ri-refresh-line"></i> 刷新
+    </button>
+  </div>
+  <div class="panel-body">
+    <div class="list-head" style="grid-template-columns: 28px 1.4fr 1fr 1.6fr 80px 2fr 130px;">
+      <div></div>
+      <div>TraceID</div>
+      <div>消息类型</div>
+      <div>发送方 → 接收方</div>
+      <div>状态</div>
+      <div>输出摘要</div>
+      <div>时间</div>
+    </div>
+    <div id="logsTbody" class="list-body" style="max-height:50vh;overflow-y:auto;">
+      <div class="list-empty"><i class="ri-loader-4-line"></i>加载中…</div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_script %}
+<script src="{% static 'js/agents.js' %}"></script>
+{% endblock %}

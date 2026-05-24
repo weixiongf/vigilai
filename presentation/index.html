@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Strategic Radar · 演示文稿目录</title>
+<link rel="stylesheet" href="assets/css/common.css">
+<style>
+  html,body{overflow:auto;}
+  .index-wrap{width:var(--slide-w);max-width:100%;margin:0 auto;padding:40px 48px;}
+  .index-hero{text-align:center;padding:60px 0 48px;}
+  .index-hero h1{font-size:48px;font-weight:900;background:linear-gradient(135deg,#60A5FA,#F59E0B);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  .index-hero .sub{font-size:18px;color:var(--text-2);margin-top:10px;}
+  .start-btn{display:inline-block;margin-top:28px;padding:14px 48px;
+    background:var(--primary);color:#fff;border-radius:30px;font-size:17px;
+    font-weight:700;text-decoration:none;letter-spacing:.03em;
+    transition:background .2s,transform .15s;}
+  .start-btn:hover{background:#1D4ED8;transform:translateY(-2px);}
+  .act-chips{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+  .act-chip{padding:4px 14px;border-radius:20px;font-size:13px;
+    border:1px solid var(--border);color:var(--text-2);}
+  .slides-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:8px;}
+  .slide-thumb{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;
+    padding:16px 18px;text-decoration:none;color:var(--text-1);
+    transition:border-color .2s,background .2s;display:flex;flex-direction:column;gap:6px;}
+  .slide-thumb:hover{border-color:var(--primary);background:var(--bg-card2);}
+  .slide-thumb .num{font-size:11px;color:var(--text-2);font-variant-numeric:tabular-nums;}
+  .slide-thumb .ttl{font-size:14px;font-weight:600;line-height:1.3;}
+  .slide-thumb .act{font-size:11px;padding:2px 8px;border-radius:10px;align-self:flex-start;}
+  .sect-title{font-size:16px;font-weight:700;color:var(--text-2);
+    text-transform:uppercase;letter-spacing:.06em;margin:32px 0 14px;
+    display:flex;align-items:center;gap:10px;}
+  .sect-title::before{content:'';flex:1;height:1px;background:var(--border);}
+  .sect-title::after{content:'';flex:1;height:1px;background:var(--border);}
+</style>
+</head>
+<body style="overflow:auto;background:#050B18;">
+<div class="index-wrap">
+  <div class="index-hero">
+    <h1>Strategic Radar</h1>
+    <p class="sub">海外市场战略情报 Agent — 项目演示文稿</p>
+    <div class="act-chips">
+      <span class="act-chip">🎯 黑客松 · 赛道A</span>
+      <span class="act-chip">🌐 出海情报</span>
+      <span class="act-chip">🤖 多智能体</span>
+      <span class="act-chip">📊 PEST / SWOT</span>
+      <span class="act-chip">⚡ 实时推送</span>
+    </div>
+    <a href="slide-01-cover.html" class="start-btn">▶ 开始演示</a>
+    <p style="margin-top:14px;font-size:13px;color:var(--text-2);">使用 ← → 方向键翻页 · 共 20 页</p>
+  </div>
+
+  <div class="sect-title">第一幕 · 痛点与定义</div>
+  <div class="slides-grid">
+    <a class="slide-thumb" href="slide-01-cover.html">
+      <span class="num">01 / 20</span>
+      <span class="ttl">封面</span>
+      <span class="act tag tag-blue">Cover</span>
+    </a>
+    <a class="slide-thumb" href="slide-02-pain-points.html">
+      <span class="num">02 / 20</span>
+      <span class="ttl">行业洞察：3大情报困局</span>
+      <span class="act tag tag-red">Pain Points</span>
+    </a>
+    <a class="slide-thumb" href="slide-03-mission.html">
+      <span class="num">03 / 20</span>
+      <span class="ttl">核心问题定义</span>
+      <span class="act tag tag-orange">Mission</span>
+    </a>
+    <a class="slide-thumb" href="slide-04-personas.html">
+      <span class="num">04 / 20</span>
+      <span class="ttl">用户画像 / 使用场景</span>
+      <span class="act tag tag-green">Personas</span>
+    </a>
+    <a class="slide-thumb" href="slide-05-five-dimensions.html">
+      <span class="num">05 / 20</span>
+      <span class="ttl">系统五大战略维度</span>
+      <span class="act tag tag-blue">Framework</span>
+    </a>
+  </div>
+
+  <div class="sect-title">第二幕 · 解决方案与价值</div>
+  <div class="slides-grid">
+    <a class="slide-thumb" href="slide-06-solution.html">
+      <span class="num">06 / 20</span>
+      <span class="ttl">智能情报驾驶舱</span>
+      <span class="act tag tag-blue">Solution</span>
+    </a>
+    <a class="slide-thumb" href="slide-07-data-strategy.html">
+      <span class="num">07 / 20</span>
+      <span class="ttl">数据采集：双引擎策略</span>
+      <span class="act tag tag-green">Data</span>
+    </a>
+    <a class="slide-thumb" href="slide-08-value-score.html">
+      <span class="num">08 / 20</span>
+      <span class="ttl">4维价值评分模型</span>
+      <span class="act tag tag-orange">Score</span>
+    </a>
+    <a class="slide-thumb" href="slide-09-pest-framework.html">
+      <span class="num">09 / 20</span>
+      <span class="ttl">PEST 框架落地</span>
+      <span class="act tag tag-blue">PEST</span>
+    </a>
+    <a class="slide-thumb" href="slide-10-swot-matrix.html">
+      <span class="num">10 / 20</span>
+      <span class="ttl">SWOT 矩阵 + 跨象限策略</span>
+      <span class="act tag tag-green">SWOT</span>
+    </a>
+    <a class="slide-thumb" href="slide-11-briefings.html">
+      <span class="num">11 / 20</span>
+      <span class="ttl">战略简报 Daily / Weekly</span>
+      <span class="act tag tag-blue">Briefings</span>
+    </a>
+    <a class="slide-thumb" href="slide-12-alert-pipeline.html">
+      <span class="num">12 / 20</span>
+      <span class="ttl">高影响告警链路</span>
+      <span class="act tag tag-red">Alerts</span>
+    </a>
+    <a class="slide-thumb" href="slide-13-human-loop.html">
+      <span class="num">13 / 20</span>
+      <span class="ttl">人机协同：反馈学习</span>
+      <span class="act tag tag-orange">Human Loop</span>
+    </a>
+    <a class="slide-thumb" href="slide-14-screenshot-dashboard.html">
+      <span class="num">14 / 20</span>
+      <span class="ttl">驾驶舱演示实况</span>
+      <span class="act tag tag-green">Demo</span>
+    </a>
+  </div>
+
+  <div class="sect-title">第三幕 · 技术与未来</div>
+  <div class="slides-grid">
+    <a class="slide-thumb" href="slide-15-architecture.html">
+      <span class="num">15 / 20</span>
+      <span class="ttl">技术架构总览</span>
+      <span class="act tag tag-blue">Architecture</span>
+    </a>
+    <a class="slide-thumb" href="slide-16-database.html">
+      <span class="num">16 / 20</span>
+      <span class="ttl">数据库设计要点</span>
+      <span class="act tag tag-gray">Database</span>
+    </a>
+    <a class="slide-thumb" href="slide-17-llm-mock.html">
+      <span class="num">17 / 20</span>
+      <span class="ttl">LLM 抽象与 Mock 模式</span>
+      <span class="act tag tag-orange">LLM</span>
+    </a>
+    <a class="slide-thumb" href="slide-18-metrics.html">
+      <span class="num">18 / 20</span>
+      <span class="ttl">关键指标 / 演示数据</span>
+      <span class="act tag tag-green">Metrics</span>
+    </a>
+    <a class="slide-thumb" href="slide-19-roadmap.html">
+      <span class="num">19 / 20</span>
+      <span class="ttl">产品路线图</span>
+      <span class="act tag tag-blue">Roadmap</span>
+    </a>
+    <a class="slide-thumb" href="slide-20-team.html">
+      <span class="num">20 / 20</span>
+      <span class="ttl">致谢 & 团队</span>
+      <span class="act tag tag-accent" style="background:rgba(245,158,11,.2);color:#FCD34D;">Team</span>
+    </a>
+  </div>
+  <p style="text-align:center;color:var(--text-2);font-size:12px;padding:40px 0 20px;">
+    Strategic Radar — See Earlier, Decide Smarter · 2026
+  </p>
+</div>
+</body>
+</html>

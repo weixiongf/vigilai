@@ -1,0 +1,482 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_intro %}
+<div class="page-intro feed-intro">
+  <div class="breadcrumbs">
+    <span>战略情报</span><span class="sep">/</span>
+    <span>市场动态</span>
+  </div>
+  <div class="intro-h1-row">
+    <h1><i class="ri-pulse-line"></i> 市场动态</h1>
+    <div class="feed-intro-actions">
+      <div class="batch-analyze-wrap" id="batchAnalyzeWrap">
+        <button class="btn btn-primary batch-main" id="btnBatchAnalyze"
+                title="对当前范围内的多条情报并发调用 LLM 分析">
+          <i class="ri-flashlight-fill"></i>
+          <span>批量分析</span>
+          <span class="batch-scope-tag" id="batchScopeTag">未分析</span>
+        </button>
+        <button class="btn btn-primary batch-caret" id="btnBatchCaret"
+                title="选择范围" aria-haspopup="true" aria-expanded="false">
+          <i class="ri-arrow-down-s-line"></i>
+        </button>
+        <ul class="batch-scope-menu" id="batchScopeMenu" role="menu" hidden>
+          <li role="menuitem" data-scope="today"><i class="ri-calendar-event-line"></i> 今天</li>
+          <li role="menuitem" data-scope="7d"><i class="ri-calendar-2-line"></i> 七天</li>
+          <li role="menuitem" data-scope="unanalyzed" class="selected"><i class="ri-question-line"></i> 未分析</li>
+          <li role="menuitem" data-scope="top20"><i class="ri-list-ordered"></i> 前 20 条</li>
+          <li role="menuitem" data-scope="top50"><i class="ri-list-ordered"></i> 前 50 条</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="desc">
+    全量原始采集数据（RawInfo） · 点「未分析」查看刚采集进来还没调 LLM 的原始条目 ·
+    点行末「立即分析」一键调用 LLM
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{# ===================== 原始数据状态快捷开关 ===================== #}
+<div class="panel" style="padding:6px 10px;margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+  <span class="muted" style="font-size:var(--fz-xxs);">
+    <i class="ri-database-2-line"></i> 原始数据状态:
+  </span>
+  <div class="btn-group" id="feedProcessedSwitch" role="group">
+    <button class="btn btn-ghost btn-sm proc-btn active" data-proc=""><i class="ri-stack-line"></i> 全部</button>
+    <button class="btn btn-ghost btn-sm proc-btn" data-proc="0"><i class="ri-time-line"></i> 未分析</button>
+    <button class="btn btn-ghost btn-sm proc-btn" data-proc="1"><i class="ri-checkbox-circle-line"></i> 已分析</button>
+  </div>
+  <span class="muted" id="feedProcStat" style="font-size:var(--fz-xxs);margin-left:auto;">加载中…</span>
+</div>
+
+{# ===================== 搜索栏 + 筛选 ===================== #}
+<div class="panel" style="padding:8px 10px;margin-bottom:8px;">
+  <div class="search-row">
+    <div class="searchbar">
+      <input id="feedQ" type="text" placeholder="搜索标题 / 内容关键词…" autocomplete="off">
+    </div>
+    <button class="btn btn-ghost" id="btnFeedSearch" title="搜索">
+      <i class="ri-search-line"></i>
+    </button>
+    <button class="btn btn-ghost" id="btnFeedReset" title="重置">
+      <i class="ri-restart-line"></i>
+    </button>
+    <span class="live-badge" id="feedLiveBadge"
+          style="display:inline-flex;align-items:center;gap:4px;padding:0 10px;font-size:var(--fz-xxs);">
+      <i class="ri-radio-button-line"></i> 实时
+    </span>
+  </div>
+
+  <div class="flex items-center gap-2 mb-1">
+    <select id="feedDim" class="select select-sm">
+      <option value="">全部维度</option>
+      <option value="competition">竞争</option>
+      <option value="product">产品</option>
+      <option value="platform">平台</option>
+      <option value="social">社媒</option>
+      <option value="regulation">法规</option>
+      <option value="macro">宏观</option>
+      <option value="industry">行业</option>
+    </select>
+    <select id="feedPest" class="select select-sm">
+      <option value="">全部 PEST</option>
+      <option value="P">P 政治法律</option>
+      <option value="E">E 经济</option>
+      <option value="S">S 社会文化</option>
+      <option value="T">T 技术</option>
+    </select>
+    <select id="feedOT" class="select select-sm">
+      <option value="">机会 / 威胁</option>
+      <option value="O">机会</option>
+      <option value="T">威胁</option>
+    </select>
+    <select id="feedLevel" class="select select-sm">
+      <option value="">全部等级</option>
+      <option value="H">高</option>
+      <option value="M">中</option>
+      <option value="L">低</option>
+    </select>
+    <input id="feedMinScore" type="number" min="0" max="10" step="0.5"
+           class="input input-sm" placeholder="最小影响分" style="width:110px">
+    <select id="feedOrder" class="select select-sm">
+      <option value="-published_at">最新优先</option>
+      <option value="-impact_score">高分优先</option>
+    </select>
+    <span class="muted" id="feedTotal" style="margin-left:auto;font-size:var(--fz-xxs);">0 条</span>
+  </div>
+
+  <div class="tagbar" id="feedTagbar">
+    <span class="tagbar-empty">未应用筛选条件</span>
+  </div>
+</div>
+
+{# ===================== 全宽情报流列表（详情在右侧抽屉） ===================== #}
+<div class="panel" style="margin-bottom:0;">
+  <div class="panel-h">
+    <h3><i class="ri-flashlight-line"></i> 情报流</h3>
+    <div class="pager">
+      <button class="btn btn-ghost btn-sm" id="feedPrev" title="上一页">
+        <i class="ri-arrow-left-s-line"></i>
+      </button>
+      <span id="feedPage" style="padding:0 8px;font-size:var(--fz-xxs);">1</span>
+      <button class="btn btn-ghost btn-sm" id="feedNext" title="下一页">
+        <i class="ri-arrow-right-s-line"></i>
+      </button>
+    </div>
+  </div>
+  <div class="panel-body">
+    <div class="feed-list" id="feedList" style="max-height:72vh;overflow-y:auto;">
+      <div class="list-empty"><i class="ri-loader-4-line"></i>加载中…</div>
+    </div>
+  </div>
+</div>
+
+{# ===================== 右侧抽屉 · 情报详情 ===================== #}
+<aside id="feedDrawer" class="src-drawer feed-drawer" hidden aria-hidden="true"
+       role="dialog" aria-labelledby="feedDrawerTitle">
+  <div class="sd-head">
+    <h4 id="feedDrawerTitle">
+      <i class="ri-file-search-line"></i> 情报详情
+    </h4>
+    <span class="sd-close" id="feedDrawerClose" title="关闭 (Esc)">
+      <i class="ri-close-line"></i>
+    </span>
+  </div>
+  <div class="sd-body">
+    <div class="feed-detail" id="feedDetail">
+      <div class="empty-state">
+        <i class="ri-cursor-line"></i>
+        <div class="es-title">尚未选择</div>
+        <div class="es-sub">点击列表情报查看详情</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+{% endblock %}
+
+{% block extra_script %}
+{# ============================================================ #}
+{# 顶部浮动浮窗: 临时显示 LLM 思考模式 + 流式正式输出.
+   完成 5 秒后自动隐藏. 通过 monkey-patch EventSource 实现, 与 feed.js 解耦. #}
+<style>
+#sseFloatPanel {
+  position: fixed; top: 16px; left: 50%; transform: translateX(-50%) translateY(-12px);
+  z-index: 99999; width: min(960px, 92vw); max-height: 60vh;
+  background: rgba(20, 22, 28, 0.96); color: #e6e9ef;
+  border: 1px solid rgba(80, 160, 255, 0.55);
+  border-radius: 8px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(80, 160, 255, 0.15);
+  font-size: 12px; line-height: 1.55;
+  display: none; opacity: 0;
+  transition: opacity .25s ease, transform .25s ease;
+  backdrop-filter: blur(8px);
+  font-family: ui-sans-serif, system-ui, 'Segoe UI', sans-serif;
+}
+#sseFloatPanel.show { display: block; opacity: 1; transform: translateX(-50%) translateY(0); }
+#sseFloatPanel .sf-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(90deg, rgba(80,160,255,0.18), rgba(80,160,255,0.02));
+  border-radius: 8px 8px 0 0;
+}
+#sseFloatPanel .sf-title { font-weight: 600; color: #4ea1ff; letter-spacing: .5px; }
+#sseFloatPanel .sf-meta  { margin-left: auto; font-variant-numeric: tabular-nums; color: #9aa3b2; }
+#sseFloatPanel .sf-close {
+  cursor: pointer; padding: 2px 8px; border-radius: 4px;
+  color: #9aa3b2; user-select: none;
+}
+#sseFloatPanel .sf-close:hover { background: rgba(255,255,255,0.08); color: #fff; }
+#sseFloatPanel .sf-body {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+  max-height: calc(60vh - 38px); overflow: hidden;
+}
+#sseFloatPanel .sf-col {
+  padding: 10px 12px; overflow: auto; max-height: calc(60vh - 38px);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  white-space: pre-wrap; word-break: break-word;
+}
+#sseFloatPanel .sf-col + .sf-col { border-left: 1px solid rgba(255,255,255,0.08); }
+#sseFloatPanel .sf-col-h {
+  font-family: ui-sans-serif, system-ui, sans-serif; font-size: 11px; font-weight: 600;
+  color: #ffb347; letter-spacing: 1px; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+#sseFloatPanel .sf-col.right .sf-col-h { color: #5fd97a; }
+#sseFloatPanel .sf-col-h i.spin { animation: sfSpin 1s linear infinite; }
+#sseFloatPanel.done .sf-col-h i.spin { animation: none; opacity: .55; }
+@keyframes sfSpin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+#sseFloatPanel .sf-content { font-size: 12px; color: #d6dae3; }
+#sseFloatPanel .sf-content .think-step {
+  margin: 4px 0; padding: 4px 6px;
+  border-left: 2px solid rgba(255,179,71,0.55);
+  background: rgba(255,179,71,0.06);
+  border-radius: 0 4px 4px 0;
+}
+#sseFloatPanel.done { border-color: rgba(95,217,122,0.55); }
+#sseFloatPanel.error { border-color: rgba(255,99,99,0.65); }
+#sseFloatPanel.error .sf-title { color: #ff6363; }
+</style>
+<script>
+(function () {
+  // 版本指纹: 如果你在 console 看不到下面这行绿色日志,
+  // 说明 feed.html 本体被浏览器缓存了旧版 — 需 Ctrl+Shift+R 硬刷。
+  // 用 console.log (不是 info) 避免被默认 console 级别过滤。
+  console.log('%c[feed.html inline]', 'color:#5fd97a;font-weight:bold;font-size:13px;',
+              'v=2026-05-24-flush  · SSE 256B padding · 1Hz heartbeat · 1500字/s加速');
+  if (window.__sseFloatHooked) return;
+  window.__sseFloatHooked = true;
+  const OriginalES = window.EventSource;
+  if (!OriginalES) return;
+
+  function ensurePanel() {
+    let p = document.getElementById('sseFloatPanel');
+    if (p) return p;
+    p = document.createElement('div');
+    p.id = 'sseFloatPanel';
+    p.innerHTML = ''
+      + '<div class="sf-head">'
+      +   '<i class="ri-cpu-line" style="color:#4ea1ff;"></i>'
+      +   '<span class="sf-title">LLM 流式分析</span>'
+      +   '<span class="sf-meta" id="sfMeta">--</span>'
+      +   '<span class="sf-close" id="sfClose" title="关闭">✕</span>'
+      + '</div>'
+      + '<div class="sf-body">'
+      +   '<div class="sf-col left">'
+      +     '<div class="sf-col-h"><i class="ri-brain-line spin"></i><span>思考模式 / 思维链</span></div>'
+      +     '<div class="sf-content" id="sfThink"><span style="opacity:.5;">等待思考过程…</span></div>'
+      +   '</div>'
+      +   '<div class="sf-col right">'
+      +     '<div class="sf-col-h"><i class="ri-flashlight-line spin"></i><span>流式输出</span></div>'
+      +     '<div class="sf-content" id="sfTokens"><span style="opacity:.5;">等待首个 token…</span></div>'
+      +   '</div>'
+      + '</div>';
+    document.body.appendChild(p);
+    p.querySelector('#sfClose').addEventListener('click', function () {
+      p.classList.remove('show');
+      if (p.__hideTimer) { clearTimeout(p.__hideTimer); p.__hideTimer = null; }
+    });
+    return p;
+  }
+
+  function resetPanel(id) {
+    const p = ensurePanel();
+    p.classList.remove('done', 'error');
+    if (p.__hideTimer) { clearTimeout(p.__hideTimer); p.__hideTimer = null; }
+    p.querySelector('#sfMeta').textContent = '#' + id + ' 连接中…';
+    // 左栏预置提示, 出现则说明 inline 脚本加载成功
+    p.querySelector('#sfThink').innerHTML = '<span style="color:#ffb347">[已订阅 reasoning 事件]</span><br><span style="opacity:.5;">等待思考过程… (v4-pro 首个 thinking token 约 1–3秒)</span>';
+    p.querySelector('#sfTokens').innerHTML = '<span style="opacity:.5;">等待首个 token… (v4-pro 思考完后才开始输出正文, 可能需 5–60秒)</span>';
+    requestAnimationFrame(function () { p.classList.add('show'); });
+    return p;
+  }
+
+  function appendThink(panel, html) {
+    const box = panel.querySelector('#sfThink');
+    if (box.firstChild && box.firstChild.nodeType === 1 && box.firstChild.style && box.firstChild.style.opacity === '0.5') {
+      box.innerHTML = '';
+    }
+    const div = document.createElement('div');
+    div.className = 'think-step';
+    div.innerHTML = html;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function appendToken(panel, tok) {
+    const box = panel.querySelector('#sfTokens');
+    if (box.firstChild && box.firstChild.nodeType === 1 && box.firstChild.style && box.firstChild.style.opacity === '0.5') {
+      box.textContent = '';
+    }
+    box.appendChild(document.createTextNode(tok));
+    box.scrollTop = box.scrollHeight;
+  }
+
+  // 思考模式左栏的逐字追加: 首次清除 placeholder 并创建一个流式段,
+  // 后续所有 reasoning token 都附加到该段的末尾文本节点.
+  function appendReasoningText(panel, tok) {
+    const box = panel.querySelector('#sfThink');
+    // 清除 placeholder
+    if (box.firstChild && box.firstChild.nodeType === 1 && box.firstChild.style && box.firstChild.style.opacity === '0.5') {
+      box.innerHTML = '';
+    }
+    let stream = box.querySelector('.reasoning-stream');
+    if (!stream) {
+      stream = document.createElement('div');
+      stream.className = 'think-step reasoning-stream';
+      stream.style.whiteSpace = 'pre-wrap';
+      const head = document.createElement('b');
+      head.style.color = '#ffb347';
+      head.textContent = '[思考过程] ';
+      stream.appendChild(head);
+      box.appendChild(stream);
+    }
+    stream.appendChild(document.createTextNode(tok));
+    box.scrollTop = box.scrollHeight;
+  }
+
+  // 打字机节流渲染 (通用版): 传入 renderFn(text) 告知能如何写入 DOM.
+  // 后端可能在 1–2 秒内吐完上千字 (超过 1000 字/s),
+  // 肉眼看起来就是 "跳出来". 这里用 token 队列 + setTimeout 限速。
+  // v=2026-05-24-fast: 加速到 ~1500 字/s, 避免后端吐完后前端还要动画几秒.
+  function makeTypewriter(renderFn) {
+    const queue = [];
+    let running = false;
+    const flushInterval = 12;
+
+    function tick() {
+      if (queue.length === 0) { running = false; return; }
+      let n = 8;
+      if (queue.length > 600) n = 40;
+      else if (queue.length > 150) n = 20;
+      const out = queue.splice(0, n).join('');
+      try { renderFn(out); } catch (_) {}
+      setTimeout(tick, flushInterval);
+    }
+
+    return {
+      push: function (s) {
+        if (!s) return;
+        for (let i = 0; i < s.length; i++) queue.push(s[i]);
+        if (!running) { running = true; setTimeout(tick, flushInterval); }
+      },
+      flushAll: function () {
+        if (queue.length === 0) return;
+        try { renderFn(queue.splice(0, queue.length).join('')); } catch (_) {}
+      },
+      pending: function () { return queue.length; }
+    };
+  }
+
+  function escHTML(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  window.EventSource = function (url, opts) {
+    const inst = new OriginalES(url, opts);
+    try {
+      const u = String(url || '');
+      console.info('%c[SSE]', 'color:#4ea1ff;font-weight:bold;', 'new EventSource ->', u);
+      const m = u.match(/\/intel\/(\d+)\/analyze-stream/);
+      if (!m) return inst;
+      const id = m[1];
+      const panel = resetPanel(id);
+      let total = 0, thinkTotal = 0, t0 = Date.now();
+      const typer = makeTypewriter(function (text) { appendToken(panel, text); });
+      const thinkTyper = makeTypewriter(function (text) { appendReasoningText(panel, text); });
+
+      inst.addEventListener('heartbeat', function (e) {
+        // 后端每秒发一次心跳, 思考阶段也能看到 "进度生命体征".
+        try {
+          const d = JSON.parse(e.data || '{}');
+          console.log('%c[SSE]', 'color:#88c;', '#' + id, '♥ heartbeat',
+                      'elapsed=' + (d.elapsed || '?') + 's',
+                      'rea=' + (d.rea || 0), 'tok=' + (d.tok || 0));
+          // 当思考 / 正文都还未开始时, 在左栏提示实时耗时
+          if ((d.rea || 0) === 0 && (d.tok || 0) === 0) {
+            const box = panel.querySelector('#sfThink');
+            const lastChild = box.lastChild;
+            if (lastChild && lastChild.id === 'sfHeartbeatTip') {
+              lastChild.textContent = '❤ 等待思考模式首个 token… (后端已连接 ' + (d.elapsed || '?') + 's)';
+            } else {
+              const tip = document.createElement('div');
+              tip.id = 'sfHeartbeatTip';
+              tip.style.cssText = 'opacity:.6;color:#88c;margin-top:4px;font-size:11px;';
+              tip.textContent = '❤ 等待思考模式首个 token… (后端已连接 ' + (d.elapsed || '?') + 's)';
+              box.appendChild(tip);
+            }
+          }
+        } catch (_) {}
+      });
+      inst.addEventListener('open', function () {
+        console.log('%c[SSE]', 'color:#5fd97a;font-weight:bold;', '#' + id, 'OPEN @' + ((Date.now()-t0)/1000).toFixed(3) + 's');
+      });
+      inst.addEventListener('start', function (e) {
+        console.log('[SSE]', '#' + id, 'start @' + ((Date.now()-t0)/1000).toFixed(3) + 's');
+        try {
+          const d = JSON.parse(e.data);
+          panel.querySelector('#sfMeta').textContent = '#' + id + ' · ' + (d.title || '').slice(0, 40);
+        } catch (_) {}
+      });
+      inst.addEventListener('thinking', function (e) {
+        console.log('[SSE]', '#' + id, 'thinking @' + ((Date.now()-t0)/1000).toFixed(3) + 's');
+        try {
+          const d = JSON.parse(e.data);
+          appendThink(panel, '<b style="color:#ffb347">[' + escHTML(d.step || 'thinking') + ']</b> ' + escHTML(d.text || ''));
+        } catch (_) {}
+      });
+      inst.addEventListener('reasoning', function (e) {
+        try {
+          const d = JSON.parse(e.data);
+          const tok = d.token || '';
+          thinkTotal += tok.length;
+          // 后端思考流 (deepseek-reasoner reasoning_content 或 <thinking>标签内容)
+          if (thinkTotal % 50 === 0 || thinkTotal < 5) {
+            console.log('[SSE]', '#' + id, 'reasoning #' + thinkTotal + ' @' + ((Date.now()-t0)/1000).toFixed(3) + 's');
+          }
+          thinkTyper.push(tok);
+        } catch (_) {}
+      });
+      inst.addEventListener('token', function (e) {
+        try {
+          const d = JSON.parse(e.data);
+          const tok = d.token || '';
+          total += tok.length;
+          // 每个 token 都打时间戳 — 用于诊断是"真流式"还是"瞬间爆发"
+          // 如果双 token 的 dt 都 ≈ 0±5ms => 后端/服务器缓冲了
+          // 如果 dt 是 · 5–8ms / 30–80ms 不等 => 真流式
+          console.log('[SSE]', '#' + id, 'token #' + total + ' @' + ((Date.now()-t0)/1000).toFixed(3) + 's tok=' + JSON.stringify(tok));
+          typer.push(tok);
+          panel.querySelector('#sfMeta').textContent = '#' + id + ' · ' + total + ' 字 · ' + ((Date.now()-t0)/1000).toFixed(1) + 's · 队列 ' + typer.pending();
+        } catch (_) {}
+      });
+      inst.addEventListener('chain', function (e) {
+        console.log('[SSE]', '#' + id, 'chain @' + ((Date.now()-t0)/1000).toFixed(3) + 's');
+        try {
+          const d = JSON.parse(e.data);
+          const resp = (d.response || '').slice(0, 280);
+          appendThink(panel, '<b style="color:#4ea1ff">[' + escHTML(d.step || 'chain') + ']</b> ' + escHTML(resp));
+        } catch (_) {}
+      });
+      inst.addEventListener('done', function () {
+        console.log('%c[SSE]', 'color:#5fd97a;font-weight:bold;', '#' + id, 'DONE total=' + total + ' @' + ((Date.now()-t0)/1000).toFixed(3) + 's');
+        // 如果打字机队列还有残余 (正文或思考), 等它们全部打完再进入 done 状态
+        function finalize() {
+          panel.classList.add('done');
+          panel.querySelector('#sfMeta').textContent = '✓ 完成 · #' + id + ' · 思考 ' + thinkTotal + ' 字 · 正文 ' + total + ' 字 · ' + ((Date.now()-t0)/1000).toFixed(1) + 's · 5秒后自动隐藏';
+          if (panel.__hideTimer) clearTimeout(panel.__hideTimer);
+          panel.__hideTimer = setTimeout(function () { panel.classList.remove('show'); }, 5000);
+        }
+        // 轮询两个队列, 均为空后才收尾
+        function waitDrain() {
+          const remain = typer.pending() + thinkTyper.pending();
+          if (remain === 0) { finalize(); return; }
+          panel.querySelector('#sfMeta').textContent = '… 渲染中 · #' + id + ' · 正文 ' + total + ' 字 · 队列 ' + remain;
+          setTimeout(waitDrain, 100);
+        }
+        waitDrain();
+      });
+      inst.addEventListener('error', function (e) {
+        console.warn('[SSE]', '#' + id, 'ERROR', e);
+        panel.classList.add('error');
+        let msg = '流式连接异常';
+        try { const d = JSON.parse(e.data || '{}'); if (d.error) msg = d.error; } catch (_) {}
+        panel.querySelector('#sfMeta').textContent = '✗ ' + msg + ' · 5秒后自动隐藏';
+        if (panel.__hideTimer) clearTimeout(panel.__hideTimer);
+        panel.__hideTimer = setTimeout(function () { panel.classList.remove('show'); }, 5000);
+      });
+    } catch (err) { console.warn('[SSE] hook err', err); }
+    return inst;
+  };
+  window.EventSource.prototype = OriginalES.prototype;
+  window.EventSource.CONNECTING = OriginalES.CONNECTING;
+  window.EventSource.OPEN = OriginalES.OPEN;
+  window.EventSource.CLOSED = OriginalES.CLOSED;
+})();
+</script>
+<script src="{% static 'js/feed.js' %}?v=stream-{% now 'U' %}"></script>
+{% endblock %}

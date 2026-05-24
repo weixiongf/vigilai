@@ -1,0 +1,25 @@
+{
+  "realtime": {
+    "enabled": false
+  },
+  "market_briefing": {
+    "enabled": false,
+    "level": "all",
+    "hour": 9
+  },
+  "daily": {
+    "enabled": false,
+    "hour": 8
+  },
+  "weekly": {
+    "enabled": false,
+    "day_of_week": 0,
+    "hour": 14
+  },
+  "monthly": {
+    "enabled": false,
+    "day_of_month": -1,
+    "hour": 14
+  },
+  "updated_at": "2026-05-23T18:24:12+00:00"
+}
