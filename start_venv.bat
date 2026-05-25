@@ -1,1 +1,0 @@
-cmd /k "cd /d C:\Users\Feng\Desktop\20260523 && call .venv\Scripts\activate"
