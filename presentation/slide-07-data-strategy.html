@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>数据采集策略 · VigilAI</title>
+<link rel="stylesheet" href="assets/css/common.css">
+<style>
+.tri-engine{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;}
+.engine-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;position:relative;}
+.engine-card.paid{border-color:rgba(245,158,11,.35);}
+.engine-card.sim{border-color:rgba(16,185,129,.30);}
+.eng-badge{display:inline-flex;align-items:center;gap:8px;
+  background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.25);
+  border-radius:20px;padding:4px 14px;font-size:14px;font-weight:700;
+  color:#60A5FA;margin-bottom:12px;}
+.eng-badge.paid{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.30);color:#FBBF24;}
+.eng-badge.sim{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.25);color:#34D399;}
+.eng-title{font-size:20px;font-weight:700;margin-bottom:8px;}
+.eng-desc{font-size:15px;color:var(--text-2);margin-bottom:12px;line-height:1.5;min-height:66px;}
+.api-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.api-item{display:flex;align-items:center;gap:9px;font-size:14.5px;}
+.api-dot{width:7px;height:7px;border-radius:50%;background:var(--primary);flex-shrink:0;}
+.api-dot.amber{background:#F59E0B;}
+.api-dot.green{background:var(--success);}
+.api-name{font-weight:600;color:var(--text-1);}
+.api-sub{color:var(--text-2);}
+.eng-tag{position:absolute;top:14px;right:14px;font-size:12px;font-weight:600;
+  padding:2px 9px;border-radius:10px;letter-spacing:.04em;}
+.eng-tag.live{background:rgba(16,185,129,.12);color:#34D399;border:1px solid rgba(16,185,129,.30);}
+.eng-tag.plan{background:rgba(245,158,11,.10);color:#FBBF24;border:1px solid rgba(245,158,11,.30);}
+.eng-tag.guard{background:rgba(37,99,235,.12);color:#60A5FA;border:1px solid rgba(37,99,235,.25);}
+.strategy-row{display:flex;gap:14px;}
+.strat-box{flex:1;background:var(--bg-card);border:1px solid var(--border);
+  border-radius:10px;padding:14px 16px;}
+.strat-box h4{font-size:14px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--text-2);margin-bottom:6px;}
+.strat-box p{font-size:15px;color:var(--text-2);line-height:1.55;}
+.strat-box p strong{color:var(--text-1);}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="slide-header">
+    <div class="slide-logo"><span class="dot"></span> VigilAI</div>
+    <div id="slideChapter" class="slide-chapter muted"></div>
+    <div id="slideNum" class="slide-num"></div>
+  </div>
+  <div class="slide-body">
+   <h2 style="margin-bottom:6px;">数据采集策略 <span class="muted">·</span> 三引擎设计</h2>
+    <p class="muted" style="margin-bottom:14px;">免费 API + 付费 API + LLM 智能兜底，按 access_tier 分层调度，数据永不为空</p>
+
+    <div class="tri-engine">
+      <div class="engine-card">
+        <span class="eng-tag live">已接入</span>
+        <div class="eng-badge">⚡ 引擎 A · 免费 API</div>
+        <div class="eng-title">精选公开权威源</div>
+        <div class="eng-desc">17 个独立采集器 · 25 个 spider 注册项，覆盖宏观 / 新闻 / 公司 / 科技 / 社交 / 法规六大集群</div>
+        <ul class="api-list">
+          <li class="api-item">
+            <span class="api-dot"></span>
+            <span class="api-name">宏观金融</span>
+            <span class="api-sub">· FRED / WB / IMF / ECB / Eurostat</span>
+          </li>
+          <li class="api-item">
+            <span class="api-dot"></span>
+            <span class="api-name">事件公司</span>
+            <span class="api-sub">· GDELT / 12 路 RSS / SEC EDGAR</span>
+          </li>
+          <li class="api-item">
+            <span class="api-dot"></span>
+            <span class="api-name">科技舆情</span>
+            <span class="api-sub">· GitHub / HN / arXiv / Reddit</span>
+          </li>
+        </ul>
+      </div>
+      <div class="engine-card paid">
+        <span class="eng-tag plan">可扩展</span>
+        <div class="eng-badge paid">💎 引擎 B · 付费 API</div>
+        <div class="eng-title">商业级深度数据</div>
+        <div class="eng-desc">access_tier=paid 层级预留接入位，按企业付费意愿一键启用，覆盖免费源够不到的深度信号</div>
+        <ul class="api-list">
+          <li class="api-item">
+            <span class="api-dot amber"></span>
+            <span class="api-name">金融终端</span>
+            <span class="api-sub">· Bloomberg / Refinitiv / FactSet</span>
+          </li>
+          <li class="api-item">
+            <span class="api-dot amber"></span>
+            <span class="api-name">商业情报</span>
+            <span class="api-sub">· Crunchbase / SimilarWeb / Statista</span>
+          </li>
+          <li class="api-item">
+            <span class="api-dot amber"></span>
+            <span class="api-name">舆情合规</span>
+            <span class="api-sub">· Dow Jones DNA / LSEG / Brandwatch</span>
+          </li>
+        </ul>
+      </div>
+      <div class="engine-card sim">
+        <span class="eng-tag guard">永不空场</span>
+        <div class="eng-badge sim">🛡 引擎 C · LLM 兜底</div>
+        <div class="eng-title">LLM 智能补全</div>
+        <div class="eng-desc">真实 API 不可用时自动生成结构化情报，按市场 × 维度 × 影响类型组合稳定输出，保障简报永不为空</div>
+        <ul class="api-list">
+          <li class="api-item">
+            <span class="api-dot green"></span>
+            <span class="api-name">市场覆盖</span>
+            <span class="api-sub">· US / EU / JP / SG / BR · 5 个市场</span>
+          </li>
+          <li class="api-item">
+            <span class="api-dot green"></span>
+            <span class="api-name">维度覆盖</span>
+            <span class="api-sub">· P / E / S / T + 竞争 / 产品 / 平台</span>
+          </li>
+          <li class="api-item">
+            <span class="api-dot green"></span>
+            <span class="api-name">自动降级</span>
+            <span class="api-sub">· 失败超阈即切换，无缝兜底</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="strategy-row">
+      <div class="strat-box">
+        <h4>采集模式三档</h4>
+        <p><strong>auto</strong>：免费优先，失败超阈自动 LLM 兜底<br>
+          <strong>real</strong>：强制真实，付费档可一键启用<br>
+          <strong>simulated</strong>：强制 LLM 兜底，演示环境适用</p>
+      </div>
+      <div class="strat-box">
+        <h4>分层准入控制</h4>
+        <p>134 个候选源按 <strong>access_tier</strong>（免费/注册/付费）独立开关，
+          按 <strong>priority</strong> 四级排序；管理员一键关闭某层级；
+          <strong>URL 去重 + CrawlJob 溯源</strong>保证血统可查</p>
+      </div>
+      <div class="strat-box">
+        <h4>权威性识别</h4>
+        <p>LLM 评估每条情报的 <strong>信息源权威性 (0-2)</strong>：
+          命中央行/Fed/SEC/海关等权威关键词自动加分；
+          权威性越高 → 综合影响分越高 → 优先推送决策层</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>← → 键盘翻页</span>
+    <div class="progress-bar"><div class="progress-bar-fill"></div></div>
+    <span>VigilAI · 2026</span>
+  </div>
+</div>
+<script src="assets/js/common.js"></script>
+</body>
+</html>
