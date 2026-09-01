@@ -8,6 +8,7 @@
 -->
 
 ![VigilAI](vigilai.jpg)
+![VigilAI](screenshot.jpg)
 
 # Strategic Radar · 海外市场战略情报 Agent
 
